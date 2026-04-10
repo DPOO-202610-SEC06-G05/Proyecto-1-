@@ -40,3 +40,4 @@ public class Administrador extends Usuario {
         return historialVentas;
     }
 }
+        ###.#####
