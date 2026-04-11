@@ -21,14 +21,14 @@ public class SistemaCafe {
 
     public void arrancarSistema() {
         try {
-            System.out.println("Iniciando sistema y cargando datos...");
+            System.out.println("Iniciando y cargando datos :)");
             this.usuariosSistema = persistencia.cargarUsuarios();
             this.inventarioPrestamo = persistencia.cargarInventarioPrestamo();
             this.inventarioVenta = persistencia.cargarInventarioVenta();
             
             this.historialVentasGlobal = persistencia.cargarVentas(this.usuariosSistema);
             
-            System.out.println("¡Datos cargados correctamente!");
+            System.out.println("Datos cargados correctamente :D");
         } catch (IOException e) {
             System.out.println("Error al cargar los datos: " + e.getMessage());
         }
@@ -36,15 +36,15 @@ public class SistemaCafe {
 
     public void apagarSistema() {
         try {
-            System.out.println("Guardando el estado del sistema...");
+            System.out.println("Guardando ;)");
             persistencia.guardarUsuarios(this.usuariosSistema);
             persistencia.guardarInventarioPrestamo(this.inventarioPrestamo);
             persistencia.guardarInventarioVenta(this.inventarioVenta);
             persistencia.guardarVentas(this.historialVentasGlobal);
             
-            System.out.println("¡Datos guardados exitosamente. Hasta pronto!");
+            System.out.println("Hecho :D");
         } catch (IOException e) {
-            System.out.println("Error al guardar los datos: " + e.getMessage());
+            System.out.println("Error de guardado :(" + e.getMessage());
         }
     }
 
