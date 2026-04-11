@@ -11,39 +11,35 @@ public abstract class Usuario {
         this.password = password;
     }
 
-    public int getid(){
+    public int getId(){
         return id;
     }
 
-    public String getusername(){
+    public String getUsername(){
         return username;
     }
 
-    public String getemail(){
+    public String getEmail(){
         return email;
     }
 
-    public String getpassword(){
+    public String getPassword(){
         return password;
     }
 
     public boolean login(String username, String email, String password) {
-        if (username.equals(this.username)&&email.equals(this.email)&&password.equals(this.password)){
-            return true;
-        }else{
-            return false;
-        }
+        return this.username.equals(username) && this.email.equals(email) && this.password.equals(password);
     }
 
-    public void setusername(String username){
+    public void setUsername(String username){
         this.username = username;
     }
     
-    public void setemail(String email){
+    public void setEmail(String email){
         this.email = email;
     }
     
-    public void setpassword(String password){
+    public void setPassword(String password){
         this.password = password;
     }
 }

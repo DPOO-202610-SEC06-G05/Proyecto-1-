@@ -27,9 +27,15 @@ public class Administrador extends Usuario {
         return juego.getHistorialPrestamos();
     }
 
-    public void repararJuego(Juego juego1, Juego juego2){
-        juego1.setEstado("disponible");
-        juego2.setEstado("disponible");
+    public void repararJuego(Juego juegoVenta, Juego juegoPrestamo){
+        if(juegoVenta.getCantidadVenta() > 0) {
+            juegoVenta.setCantidadVenta(juegoVenta.getCantidadVenta() - 1);
+            juegoPrestamo.setCantidadPrestamo(juegoPrestamo.getCantidadPrestamo() + 1);
+            juegoPrestamo.setCantidadPrestamoLibre(juegoPrestamo.getCantidadPrestamoLibre() + 1);
+            juegoPrestamo.setEstado("Nuevo");
+        } else {
+            System.out.println("No hay copias en el inventario de venta para reparar este juego.");
+        }
     }
 
     public boolean aprobarSugerenciaPlatillo(String sugerencia){

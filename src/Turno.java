@@ -15,27 +15,41 @@ public class Turno {
     }
 
     public String getDia(){
-        return dia;
+        return dia; 
     }
 
-    public String getHoraInicio(){
-        return horaInicio;
+    public String getHoraInicio(){ 
+        return horaInicio; 
     }
 
-    public String getHoraFinal(){
+    public String getHoraFinal(){ 
         return horaFinal;
+     }
+    public List<Empleado> getEmpleados() { 
+        return empleados; }
+
+    public List<Integer> getIdsEmpleados() {
+        List<Integer> ids = new ArrayList<>();
+        for(Empleado e : empleados) {
+            ids.add(e.getId());
+        }
+        return ids;
     }
 
-    public void setDia(String dia){
-        this.dia = dia;
+    public void setDia(String dia){ 
+        this.dia = dia; 
     }
 
-    public void setHoraInicio(String horaInicio){
-        this.horaInicio = horaInicio;
+    public void setHoraInicio(String horaInicio){ 
+        this.horaInicio = horaInicio; 
     }
 
-    public void setHoraFinal(String horaFinal){
-        this.horaFinal = horaFinal;
+    public void setHoraFinal(String horaFinal){ 
+        this.horaFinal = horaFinal; 
+    }
+
+    public void agregarEmpleado(Empleado empleado){
+        this.empleados.add(empleado);
     }
 
     public boolean validarFuncionamientoCafe(){
@@ -51,10 +65,6 @@ public class Turno {
             }
         }
 
-        if (cocinero >=1 && mesero>=2){ 
-            return true; 
-        }else{ 
-            return false; 
-        }
+        return cocinero >= 1 && mesero >= 2;
     }
 }

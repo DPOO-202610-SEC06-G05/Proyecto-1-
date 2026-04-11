@@ -1,0 +1,142 @@
+import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Cliente extends Usuario {
+    private int puntosFidelidad;
+    private List<String> juegosFavoritos;
+    private List<String> historialCompras;
+    
+    public Cliente(int id, String username, String email, String password){
+        super(id, username, email, password);
+        this.puntosFidelidad = 0;
+        this.juegosFavoritos = new ArrayList<>();
+        this.historialCompras = new ArrayList<>();
+    }
+
+    public Cliente(int id, String username, String email, String password, int puntosFidelidad){
+        super(id, username, email, password);
+        this.puntosFidelidad = puntosFidelidad;
+        this.juegosFavoritos = new ArrayList<>();
+        this.historialCompras = new ArrayList<>();
+    }
+
+    public int getPuntos(){
+        return puntosFidelidad;
+    }
+
+    public void setPuntos(int puntos) {
+        this.puntosFidelidad = puntos;
+    }
+
+    public List<String> getJuegosFavoritos(){
+        return juegosFavoritos;
+    }
+
+    public List<String> getHistorialDeCompras(){
+        return historialCompras;
+    }
+
+    public void setJuegosFavoritos(String juego){
+        juegosFavoritos.add(juego);
+    }
+
+    public void reservarMesa(Mesa mesa, int numPersonas, boolean hayMenores, int numNinios, int numJovenes){
+        if(mesa == null){
+            System.out.println("No se ha recibido ninguna mesa.");
+        } else if (numPersonas > mesa.getCapacidad()) {
+            System.out.println("La capacidad de las personas supera la capacidad de la mesa.");
+        } else {
+            mesa.setNumPersonas(numPersonas); 
+            mesa.setHayMenores(hayMenores);
+            mesa.setNumNinios(numNinios);
+            mesa.setNumJovenes(numJovenes);
+            mesa.setOcupada(true);
+        }    
+    }
+
+    public void reservarJuegos(Juego juego, Mesa mesa, Prestamo prestamo) {
+
+        if (mesa == null || !mesa.getOcupada()) {
+            System.out.println("Debe tener una mesa asignada para pedir juegos.");
+            return;
+        }
+        if (mesa.getJuegosEnMesa().size() >= 2) {
+            System.out.println("Límite alcanzado: No puede tener más de dos juegos en la mesa.");
+            return;
+        }
+        if (juego.getCantidadPrestamoLibre() <= 0) {
+            System.out.println("El juego " + juego.getNombre() + " se encuentra prestado actualmente.");
+            return;
+        }
+        if (!juego.esAptoJugadores(mesa) || !juego.esAptoEdad(mesa)) {
+            System.out.println("El juego no es apto para los comensales de esta mesa.");
+            return;
+        }
+
+        mesa.actualizarJuegos(juego.getNombre());
+        juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() - 1);
+        prestamo.registrarPrestamo(); 
+        System.out.println("Juego '" + juego.getNombre() + "' prestado con éxito.");
+    }
+
+    public List<String> juegoDisponibles(List<Juego> inventarioPrestamo) {
+        List<String> disponibles = new ArrayList<>();
+        for (Juego j : inventarioPrestamo) {
+            if (j.getCantidadPrestamoLibre() > 0) {
+                disponibles.add(j.getNombre());
+            }
+        }
+        return disponibles;
+    }
+    
+    public void regresarJuego(Juego juego, Mesa mesa, Prestamo prestamo) {
+        if (mesa != null && mesa.getJuegosEnMesa().contains(juego.getNombre())) {
+            mesa.getJuegosEnMesa().remove(juego.getNombre());
+            juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() + 1);
+            prestamo.finalizarPrestamo();
+            System.out.println("Juego devuelto correctamente.");
+        } 
+        
+        else {
+            System.out.println("Error: El juego no se encuentra registrado en esta mesa.");
+        }
+    }
+    
+    public VentaJuego comprarJuego(Juego juegoVenta, int idVenta) {
+        if (juegoVenta.getCantidadVenta() > 0) {
+            VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juegoVenta.getPrecio(), 0.0, this);
+            
+            juegoVenta.setCantidadVenta(juegoVenta.getCantidadVenta() - 1);
+            this.historialCompras.add("Juego: " + juegoVenta.getNombre());
+            int puntosGanados = (int) (venta.getTotal() * 0.01);
+            this.puntosFidelidad += puntosGanados;
+            System.out.println("Compra exitosa. Ganaste " + puntosGanados + " puntos de fidelidad.");
+            return venta;
+        } else {
+            System.out.println("Lo sentimos, no hay copias disponibles para venta.");
+            return null;
+        }
+    }
+
+    public VentaCafeteria comprarProducto(ProductoMenu producto, Mesa mesa, int idVenta) {
+        if (producto instanceof Bebida) {
+            Bebida bebida = (Bebida) producto;
+            if (bebida.getEsAlcoholica() && mesa.getHayMenores()) {
+                System.out.println("Venta rechazada: No se sirve alcohol en mesas con menores.");
+                return null;
+            }
+        }
+        
+        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), producto.getPrecio(), this);
+        this.historialCompras.add("Producto: " + producto.getNombre());
+        
+        int puntosGanados = (int) (venta.getTotal() * 0.01);
+        this.puntosFidelidad += puntosGanados;
+        
+        System.out.println("Pedido de cafetería exitoso. Ganaste " + puntosGanados + " puntos.");
+        return venta;
+    }
+}
+
+
