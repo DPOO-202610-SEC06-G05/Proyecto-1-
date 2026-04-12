@@ -29,11 +29,13 @@ public class Pedido {
         productos.remove(producto);
     }
 
-    public double calcularTotal(){
+    public double calcularTotal() {
         double total = 0;
-        for (ProductoMenu producto : productos){
-            total += producto.getPrecio(); ///faltan impuestos
+
+        for (ProductoMenu producto : productos) {
+            total += producto.getPrecio();
         }
+
         return total;
     }
 
