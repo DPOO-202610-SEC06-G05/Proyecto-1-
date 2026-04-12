@@ -17,7 +17,7 @@ public class Mesero extends Empleado {
     public void setJuegosConocidos(String juego){ this.juegosConocidos.add(juego); }
     public void setJuegosFavoritos(String juego){ this.juegosFavoritos.add(juego); }
 
-    public void reservarJuegos(Juego juego, Prestamo prestamo, Turno turnoActual, int clientesPorAtender){
+    public void reservarJuegos(Juego juego, Prestamo prestamo, Turno turnoActual, int clientesPorAtender, InventarioPrestamo inventarioPrestamo){
         boolean trabajando = enTurno(turnoActual);
         
         if (trabajando && clientesPorAtender > 0) {
@@ -25,18 +25,18 @@ public class Mesero extends Empleado {
             return;
         }
         
-        if (juego.getCantidadPrestamoLibre() <= 0) {
+        if (inventarioPrestamo.getCantidadDisponible() <= 0) {
             System.out.println("El juego " + juego.getNombre() + " no tiene copias disponibles.");
             return;
         }
         
-        juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() - 1);
-        prestamo.registrarPrestamo();
+        inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() - 1);
+        prestamo.registrarPrestamo(juego);
         System.out.println("Juego '" + juego.getNombre() + "' prestado exitosamente al mesero.");
     }
 
-    public void regresarJuego(Juego juego, Prestamo prestamo){
-        juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() + 1);
+    public void regresarJuego(Juego juego, Prestamo prestamo, InventarioPrestamo inventarioPrestamo){
+        inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() + 1);
         prestamo.finalizarPrestamo();
         System.out.println("El mesero ha devuelto el juego correctamente.");
     }

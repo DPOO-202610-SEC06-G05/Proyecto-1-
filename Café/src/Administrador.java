@@ -10,29 +10,28 @@ public class Administrador extends Usuario {
         return juego.getEstado();
     }
 
-    public void setEstadoJuego(Juego juego, String newEstado){
-        juego.setEstado(newEstado);
+    public void setEstadoJuego(Inventario inventario, String newEstado){
+        inventario.setEstado(newEstado);
     }
 
-    public void agregarJuegoPrestamo(Juego juego, int cantidad){
-        juego.setCantidadPrestamo(juego.getCantidadPrestamo() + cantidad);
-        juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() + cantidad);
+    public void agregarJuegoPrestamo(InventarioPrestamo inventario, int cantidad){
+        inventario.setCantidadTotal(inventario.getCantidadTotal() + cantidad);
+        inventario.setCantidadDisponible(inventario.getCantidadDisponible() + cantidad);
+    }
+    public void agregarJuegoVenta(InventarioVenta inventario, int cantidad){
+        inventario.setCantidadTotal(inventario.getCantidadTotal() + cantidad);
     }
 
-    public void agregarJuegoVenta(Juego juego, int cantidad){
-        juego.setCantidadVenta(juego.getCantidadVenta() + cantidad);
+    public List<Prestamo> verHistorialPrestamo(HistorialPrestamo historial){
+        return historial.getPrestamos();
     }
 
-    public List<Prestamo> verHistorialPrestamo(Juego juego){
-        return juego.getHistorialPrestamos();
-    }
-
-    public void repararJuego(Juego juegoVenta, Juego juegoPrestamo){
-        if(juegoVenta.getCantidadVenta() > 0) {
-            juegoVenta.setCantidadVenta(juegoVenta.getCantidadVenta() - 1);
-            juegoPrestamo.setCantidadPrestamo(juegoPrestamo.getCantidadPrestamo() + 1);
-            juegoPrestamo.setCantidadPrestamoLibre(juegoPrestamo.getCantidadPrestamoLibre() + 1);
-            juegoPrestamo.setEstado("Nuevo");
+    public void repararJuego(InventarioVenta inventarioVenta, InventarioPrestamo inventarioPrestamo){
+        if(inventarioVenta.getCantidadTotal() > 0) {
+            inventarioVenta.setCantidadTotal(inventarioVenta.getCantidadTotal() - 1);
+            inventarioPrestamo.setCantidadTotal(inventarioPrestamo.getCantidadTotal() + 1);
+            inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() + 1);
+            inventarioPrestamo.setEstado("Nuevo");
         } else {
             System.out.println("No hay copias en el inventario de venta para reparar este juego.");
         }

@@ -29,19 +29,25 @@ public class Prestamo {
     public LocalDate getFechaDevolucion(){ 
         return fechaDevolucion; }
 
-    public Usuario getPrestatario() { 
-        return prestatario; }
-        
-    public Juego getJuego() { 
-        return juego; }
-
-    public void registrarPrestamo(){
-        this.estado = "activo";
+    public void registrarPrestamo(Juego juego){
         this.fecha = LocalDate.now();
+        this.estado ="activo";
+        this.fechaDevolucion = null;
     }
 
     public void finalizarPrestamo(){
         this.estado = "finalizado";
         this.fechaDevolucion = LocalDate.now();
     }
+
+    public boolean esAptoJugadores(Mesa mesa, Juego juego) {
+        int personas = mesa.getNumPersonas();
+        return personas >= juego.getMinJugadores() && personas <= juego.getMaxJugadores();
+    }
+
+    public boolean esAptoEdad(Mesa mesa, Juego juego) {
+        if (mesa.getHayMenores()) {
+            return juego.getEdadMinima() < 18;
+        }
+        return true;}
 }

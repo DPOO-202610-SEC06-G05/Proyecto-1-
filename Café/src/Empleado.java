@@ -26,14 +26,14 @@ public abstract class Empleado extends Usuario {
         System.out.println("Esta solicitud queda pendiente de aprobación por el Administrador.");
     }
 
-    public VentaJuego comprarJuego(Juego juego, String codigoDescuento, int idVenta){
-        if (juego.getCantidadVenta() > 0) {
+    public VentaJuego comprarJuego(Juego juego, String codigoDescuento, int idVenta, InventarioVenta inventarioVenta){
+        if (inventarioVenta.getCantidadTotal() > 0) {
             double porcentajeDescuento = codigoDescuento.equals("EMP20") ? 0.20 : 0.10; 
             double valorDescuento = juego.getPrecio() * porcentajeDescuento;
 
             VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juego.getPrecio(), valorDescuento, this);
             
-            juego.setCantidadVenta(juego.getCantidadVenta() - 1);
+            inventarioVenta.setCantidadTotal(inventarioVenta.getCantidadTotal() - 1);
             
             System.out.println("Compra de juego exitosa. Descuento aplicado: " + (porcentajeDescuento * 100) + "%");
             return venta;
@@ -57,4 +57,5 @@ public abstract class Empleado extends Usuario {
         System.out.println("El empleado " + this.getUsername() + " ha sugerido incluir el platillo: '" + newPlatillo + "' en el menú.");
         System.out.println("Sugerencia enviada al Administrador.");
     }
+
 }

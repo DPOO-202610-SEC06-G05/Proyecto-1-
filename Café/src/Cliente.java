@@ -55,45 +55,51 @@ public class Cliente extends Usuario {
         }    
     }
 
-    public void reservarJuegos(Juego juego, Mesa mesa, Prestamo prestamo) {
+    public void reservarJuegos(Juego juego, Mesa mesa, Prestamo prestamo, InventarioPrestamo inventarioPrestamo) {
 
         if (mesa == null || !mesa.getOcupada()) {
             System.out.println("Debe tener una mesa asignada para pedir juegos.");
             return;
         }
+    
         if (mesa.getJuegosEnMesa().size() >= 2) {
             System.out.println("Límite alcanzado: No puede tener más de dos juegos en la mesa.");
             return;
         }
-        if (juego.getCantidadPrestamoLibre() <= 0) {
+    
+        if (inventarioPrestamo.getCantidadDisponible() <= 0) {
             System.out.println("El juego " + juego.getNombre() + " se encuentra prestado actualmente.");
             return;
         }
-        if (!juego.esAptoJugadores(mesa) || !juego.esAptoEdad(mesa)) {
+    
+        if (!prestamo.esAptoJugadores(mesa, juego) || !prestamo.esAptoEdad(mesa, juego)) {
             System.out.println("El juego no es apto para los comensales de esta mesa.");
             return;
         }
-
+    
         mesa.actualizarJuegos(juego.getNombre());
-        juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() - 1);
-        prestamo.registrarPrestamo(); 
+        inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() - 1);
+        prestamo.registrarPrestamo(juego);
         System.out.println("Juego '" + juego.getNombre() + "' prestado con éxito.");
     }
+    
 
-    public List<String> juegoDisponibles(List<Juego> inventarioPrestamo) {
+    public List<String> juegoDisponibles(List<InventarioPrestamo> inventarioPrestamo) {
         List<String> disponibles = new ArrayList<>();
-        for (Juego j : inventarioPrestamo) {
-            if (j.getCantidadPrestamoLibre() > 0) {
-                disponibles.add(j.getNombre());
+    
+        for (InventarioPrestamo i : inventarioPrestamo) {
+            if (i.getCantidadDisponible() > 0) {
+                disponibles.add(i.getJuego().getNombre());
             }
         }
+    
         return disponibles;
     }
     
-    public void regresarJuego(Juego juego, Mesa mesa, Prestamo prestamo) {
+    public void regresarJuego(Juego juego, Mesa mesa, Prestamo prestamo, InventarioPrestamo inventarioPrestamo) {
         if (mesa != null && mesa.getJuegosEnMesa().contains(juego.getNombre())) {
             mesa.getJuegosEnMesa().remove(juego.getNombre());
-            juego.setCantidadPrestamoLibre(juego.getCantidadPrestamoLibre() + 1);
+            inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() + 1);
             prestamo.finalizarPrestamo();
             System.out.println("Juego devuelto correctamente.");
         } 
@@ -103,11 +109,11 @@ public class Cliente extends Usuario {
         }
     }
     
-    public VentaJuego comprarJuego(Juego juegoVenta, int idVenta) {
-        if (juegoVenta.getCantidadVenta() > 0) {
+    public VentaJuego comprarJuego(Juego juegoVenta, int idVenta, InventarioVenta inventarioVenta) {
+        if (inventarioVenta.getCantidadTotal() > 0) {
             VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juegoVenta.getPrecio(), 0.0, this);
             
-            juegoVenta.setCantidadVenta(juegoVenta.getCantidadVenta() - 1);
+            inventarioVenta.setCantidadTotal(inventarioVenta.getCantidadTotal() - 1);
             this.historialCompras.add("Juego: " + juegoVenta.getNombre());
             int puntosGanados = (int) (venta.getTotal() * 0.01);
             this.puntosFidelidad += puntosGanados;
