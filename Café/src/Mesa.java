@@ -5,25 +5,19 @@ public class Mesa {
     private int numMesa;
     private int capacidad;
     private int numPersonas;
-    private int numNinios;
-    private int numJovenes;
     private boolean hayMenores;
     private boolean hayJovenes;
     private boolean ocupada;
     private List<String> juegosEnMesa;
-    private List<String> productosEnMesa;
 
     public Mesa(int capacidad){
         this.capacidad = capacidad;
         this.numMesa = 0;
         this.numPersonas = 0;
-        this.numNinios = 0;
-        this.numJovenes = 0;
         this.hayMenores = false;
         this.hayJovenes = false;
         this.ocupada = false;
         this.juegosEnMesa = new ArrayList<>();
-        this.productosEnMesa = new ArrayList<>();
     }
 
     public int getNumMesa(){
@@ -36,14 +30,6 @@ public class Mesa {
 
     public int getNumPersonas(){
         return numPersonas;
-    }
-
-    public int getNumNinios(){
-        return numNinios;
-    }
-
-    public int getNumJovenes(){
-        return numJovenes;
     }
 
     public boolean getHayMenores(){
@@ -62,9 +48,6 @@ public class Mesa {
         return juegosEnMesa;
     }
 
-    public List<String> getProductosEnMesa(){
-        return productosEnMesa;
-    }
 
     public void setNumPersonas(int numPersonas){
         this.numPersonas = numPersonas;
@@ -74,27 +57,47 @@ public class Mesa {
         this.hayMenores = hayMenores;
     }
 
-    public void setNumNinios(int numNinios){
-        this.numNinios = numNinios;
-    }
-
-    public void setNumJovenes(int numJovenes){
-        this.numJovenes = numJovenes;
-    }
-
     public void setOcupada(boolean ocupada){
         this.ocupada = ocupada;
     }
 
-    public void actualizarJuegos(String juego){
-        this.juegosEnMesa.add(juego);
+    public void agregarJuego(Juego juego){
+        if (juego == null){
+            System.out.println("no hay juego");
+            return;
+        }
+
+        if (juegosEnMesa.size() >= 2){
+            System.out.println("no se pueden tener más de 2 juegos en la mesa");
+            return;
+        }
+
+        if (!juegoAptoParaMesa(juego)){
+            System.out.println("juego no es apto para esta mesa");
+            return;
+        }
+        String nombreJuego = juego.getNombre();
+        juegosEnMesa.add(nombreJuego);
+        System.out.println("agregado correctamente");
     }
 
     public boolean juegoAptoParaMesa(Juego juego){
         if(this.numPersonas > this.capacidad){
             return false;
-        }else{
-            return true;
         }
+        
+        if ((this.numPersonas < juego.getMinJugadores()) || (this.numPersonas > juego.getMaxJugadores())){
+            return false;
+        }
+
+        if (this.hayMenores && juego.getEdadMinima() > 5){
+            return false;
+        }
+
+        if (this.hayJovenes && juego.getEdadMinima() >= 18){
+            return false;
+        }
+
+            return true;
     }
 }

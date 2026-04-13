@@ -11,20 +11,6 @@ public class Juego {
     private boolean esDificil;
     private double precio;
 
-    public Juego(int id, String nombre, int anioPublicacion, String empresa, String categoria, int minJugadores, int maxJugadores, int edadMinima, boolean esDificil, double precio){
-        this.id = id;
-        this.nombre = nombre;
-        this.anioPublicacion = anioPublicacion;
-        this.empresa = empresa;
-        this.categoria = categoria;
-        this.minJugadores = minJugadores;
-        this.maxJugadores = maxJugadores;
-        this.edadMinima = edadMinima;
-        this.estado = "Nuevo";
-        this.esDificil = esDificil;
-        this.precio = precio;
-    }
-    
     public Juego(int id, String nombre, int anioPublicacion, String empresa, String categoria, int minJugadores, int maxJugadores, int edadMinima, boolean esDificil, String estado, double precio){
         this.id = id;
         this.nombre = nombre;

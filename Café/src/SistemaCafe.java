@@ -15,9 +15,9 @@ public class SistemaCafe {
 
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
-        this.usuariosSistema = new ArrayList<>();
-        this.inventarioPrestamo = new ArrayList<>();
-        this.inventarioVenta = new ArrayList<>();
+        this.usuariosSistema = new ArrayList<Usuario>();
+        this.inventarioPrestamo = new ArrayList<InventarioPrestamo>();
+        this.inventarioVenta = new ArrayList<InventarioVenta>();
         
         this.historialVentasGlobal = new HistorialVenta();
         this.historialPrestamoGlobal = new HistorialPrestamo();
@@ -32,7 +32,7 @@ public class SistemaCafe {
             this.inventarioPrestamo = persistencia.cargarInventarioPrestamo();
             this.inventarioVenta = persistencia.cargarInventarioVenta();
 
-            List<Venta> ventasCargadas = persistencia.cargarVentas();
+            List<Venta> ventasCargadas = persistencia.cargarVentas(this.usuariosSistema);
             for (Venta v : ventasCargadas) {
                 this.historialVentasGlobal.registrarVenta(v);
             }

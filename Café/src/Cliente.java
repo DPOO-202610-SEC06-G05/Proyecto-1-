@@ -7,13 +7,6 @@ public class Cliente extends Usuario {
     private List<String> juegosFavoritos;
     private List<String> historialCompras;
     
-    public Cliente(int id, String username, String email, String password){
-        super(id, username, email, password);
-        this.puntosFidelidad = 0;
-        this.juegosFavoritos = new ArrayList<>();
-        this.historialCompras = new ArrayList<>();
-    }
-
     public Cliente(int id, String username, String email, String password, int puntosFidelidad){
         super(id, username, email, password);
         this.puntosFidelidad = puntosFidelidad;
@@ -41,7 +34,7 @@ public class Cliente extends Usuario {
         juegosFavoritos.add(juego);
     }
 
-    public void reservarMesa(Mesa mesa, int numPersonas, boolean hayMenores, int numNinios, int numJovenes){
+    public void reservarMesa(Mesa mesa, int numPersonas, boolean hayMenores){
         if(mesa == null){
             System.out.println("No se ha recibido ninguna mesa.");
         } else if (numPersonas > mesa.getCapacidad()) {
@@ -49,8 +42,6 @@ public class Cliente extends Usuario {
         } else {
             mesa.setNumPersonas(numPersonas); 
             mesa.setHayMenores(hayMenores);
-            mesa.setNumNinios(numNinios);
-            mesa.setNumJovenes(numJovenes);
             mesa.setOcupada(true);
         }    
     }
@@ -77,7 +68,7 @@ public class Cliente extends Usuario {
             return;
         }
     
-        mesa.actualizarJuegos(juego.getNombre());
+        mesa.agregarJuego(juego);
         inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() - 1);
         prestamo.registrarPrestamo(juego);
         System.out.println("Juego '" + juego.getNombre() + "' prestado con éxito.");
