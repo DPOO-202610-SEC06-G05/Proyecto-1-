@@ -11,6 +11,13 @@ public class VentaJuego extends Venta {
         this.total = (subtotal - descuentoAplicado) * (1 + this.iva);
     }
 
+    public VentaJuego(int id, LocalDate fecha, double total, double iva, double descuentoAplicado){
+        super(id, fecha, total, null);
+        this.iva = iva;
+        this.descuentoAplicado = descuentoAplicado;
+        this.total = total;
+    }
+    
     public double getIva(){ 
         return iva; 
     }

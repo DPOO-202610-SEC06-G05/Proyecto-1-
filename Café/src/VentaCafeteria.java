@@ -10,7 +10,14 @@ public class VentaCafeteria extends Venta {
         this.propina = subtotal * 0.10;
         this.total = subtotal + (subtotal * this.impuestoConsumo) + this.propina;
     }
-
+    
+    public VentaCafeteria(int id, LocalDate fecha, double total, double impuestoConsumo, double propina){
+        super(id, fecha, total, null);
+        this.impuestoConsumo = impuestoConsumo;
+        this.propina = propina;
+        this.total = total;
+    }
+    
     public double getImpuestoConsumo(){
         return impuestoConsumo; 
     }

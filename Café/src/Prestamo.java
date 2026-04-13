@@ -13,8 +13,15 @@ public class Prestamo {
         this.fecha = fecha;
         this.estado = estado;
         this.fechaDevolucion = fechaDevolucion;
-        this.prestatario = prestatario;
-        this.juego = juego;
+    }
+
+    public Prestamo(int id, LocalDate fecha, String estado, LocalDate fechaDevolucion) {
+        this.id = id;
+        this.fecha = fecha;
+        this.estado = estado;
+        this.fechaDevolucion = fechaDevolucion;
+        this.prestatario = null;
+        this.juego = null;
     }
 
     public int getId(){

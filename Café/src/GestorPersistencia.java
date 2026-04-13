@@ -67,98 +67,152 @@ public class GestorPersistencia {
         return usuarios;
     }
 
-    private void guardarInventario(List<Juego> juegos, String archivo) throws IOException {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + archivo))) {
-            for (Juego j : juegos) {
-                writer.println(j.getId() + ";" + j.getNombre() + ";" + j.getAnioPublicacion() + ";" + 
-                               j.getEmpresa() + ";" + j.getCategoria() + ";" + j.getMinJugadores() + ";" + 
-                               j.getMaxJugadores() + ";" + j.getEdadMinima() + ";" + j.isEsDificil() + ";" + 
-                               j.getCantidadTotal() + ";" + j.getCantidadVenta() + ";" + j.getCantidadPrestamo() + ";" + 
-                               j.getCantidadPrestamoLibre() + ";" + j.getEstado() + ";" + j.getPrecio());
-            }
-        }
-    }
-
-    public void guardarInventarioVenta(List<Juego> juegos) throws IOException {
-        guardarInventario(juegos, "juegos_venta.csv");
-    }
-
-    public void guardarInventarioPrestamo(List<Juego> juegos) throws IOException {
-        guardarInventario(juegos, "juegos_prestamo.csv");
-    }
-
-    private List<Juego> cargarInventario(String archivo) throws IOException {
-        List<Juego> juegos = new ArrayList<>();
-        File file = new File(RUTA_DATOS + archivo);
-        if (!file.exists()) return juegos;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] p = linea.split(";");
-                
-                Juego j = new Juego(
-                    Integer.parseInt(p[0]), p[1], Integer.parseInt(p[2]), p[3], p[4], 
-                    Integer.parseInt(p[5]), Integer.parseInt(p[6]), Integer.parseInt(p[7]), 
-                    Boolean.parseBoolean(p[8]), Integer.parseInt(p[9]), Integer.parseInt(p[10]), 
-                    Integer.parseInt(p[11]), Integer.parseInt(p[12]), p[13], Double.parseDouble(p[14])
-                );
-                
-                juegos.add(j);
-            }
-        }
-        return juegos;
-    }
-
-    public List<Juego> cargarInventarioVenta() throws IOException {
-        return cargarInventario("juegos_venta.csv");
-    }
-
-    public List<Juego> cargarInventarioPrestamo() throws IOException {
-        return cargarInventario("juegos_prestamo.csv");
-    }
-
-
     public void guardarVentas(List<Venta> ventas) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "ventas.csv"))) {
             for (Venta v : ventas) {
                 String tipo = v.getClass().getSimpleName();
-                writer.println(v.getId() + ";" + v.getFecha() + ";" + tipo + ";" + 
-                               v.getSubtotal() + ";" + v.getTotal() + ";" + v.getComprador().getId());
+                if (v instanceof VentaJuego){
+                    writer.println(tipo + ";" + v.getId() + ";" + v.getFecha() + ";" + 
+                                   v.getTotal() + ";" + ((VentaJuego) v).getIva() + ";" + ((VentaJuego) v).getDescuento());
+                }else if(v instanceof VentaCafeteria){
+                    writer.println(tipo + ";" + v.getId() + ";" + v.getFecha() + ";" + 
+                                   v.getTotal() + ";" + ((VentaCafeteria) v).getImpuestoConsumo() + ";" + ((VentaCafeteria) v).getPropina());
+                }
             }
         }
     }
 
-    public List<Venta> cargarVentas(List<Usuario> usuariosGlobales) throws IOException {
+    public List<Venta> cargarVentas() throws IOException{
         List<Venta> ventas = new ArrayList<>();
         File file = new File(RUTA_DATOS + "ventas.csv");
         if (!file.exists()) return ventas;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
             String linea;
-            while ((linea = reader.readLine()) != null) {
+            while ((linea = reader.readLine()) != null){
                 String[] p = linea.split(";");
-                int id = Integer.parseInt(p[0]);
-                LocalDate fecha = LocalDate.parse(p[1]);
-                String tipo = p[2];
-                double subtotal = Double.parseDouble(p[3]);
-                int idComprador = Integer.parseInt(p[5]);
+                String tipo = p[0];
+                int id = Integer.parseInt(p[1]);
+                LocalDate fecha = LocalDate.parse(p[2]);
+                double total = Double.parseDouble(p[3]);
 
-                Usuario comprador = null;
-                for (Usuario u : usuariosGlobales) {
-                    if (u.getId() == idComprador) {
-                        comprador = u;
-                        break;
-                    }
-                }
-
-                if (tipo.equals("VentaJuego")) {
-                    ventas.add(new VentaJuego(id, fecha, subtotal, 0.0, comprador));
-                } else if (tipo.equals("VentaCafeteria")) {
-                    ventas.add(new VentaCafeteria(id, fecha, subtotal, comprador));
+                if (tipo.equals("VentaJuego")){
+                    double iva = Double.parseDouble(p[4]);
+                    double descuento = Double.parseDouble(p[5]);
+                    ventas.add(new VentaJuego(id, fecha, total, iva, descuento));
+                }else if(tipo.equals("VentaCafeteria")){
+                    double impuestoConsumo = Double.parseDouble(p[4]);
+                    double propina = Double.parseDouble(p[5]);
+                    ventas.add(new VentaCafeteria(id, fecha, total, impuestoConsumo, propina));
                 }
             }
         }
         return ventas;
     }
+
+    public void guardarInventarioVenta(List<InventarioVenta> inventarios) throws IOException{
+        try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "juegos_venta.csv"))){
+            for (InventarioVenta inv : inventarios){
+                Juego j = inv.getJuego();
+                writer.println(j.getId() + ";" + j.getNombre() + ";" + j.getAnioPublicacion() + ";" + 
+                               j.getEmpresa() + ";" + j.getCategoria() + ";" + j.getMinJugadores() + ";" + 
+                               j.getMaxJugadores() + ";" + j.getEdadMinima() + ";" + j.isEsDificil() + ";" + 
+                               j.getEstado() + ";" + j.getPrecio() + ";" + inv.getCantidadTotal() + ";" + inv.getEstado());
+            }
+        }
+    }
+
+    public void guardarInventarioPrestamo(List<InventarioPrestamo> inventarios) throws IOException{
+        try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "juegos_prestamo.csv"))){
+            for (InventarioPrestamo inv : inventarios){
+                Juego j = inv.getJuego();
+                writer.println(j.getId() + ";" + j.getNombre() + ";" + j.getAnioPublicacion() + ";" + 
+                               j.getEmpresa() + ";" + j.getCategoria() + ";" + j.getMinJugadores() + ";" + 
+                               j.getMaxJugadores() + ";" + j.getEdadMinima() + ";" + j.isEsDificil() + ";" + 
+                               j.getEstado() + ";" + j.getPrecio() + ";" + inv.getCantidadTotal() + ";" + 
+                               inv.getCantidadDisponible() + ";" + inv.getEstado());
+            }
+        }
+    }
+
+    public List<InventarioVenta> cargarInventarioVenta() throws IOException{
+        List<InventarioVenta> inventarios = new ArrayList<>();
+        File file = new File(RUTA_DATOS + "juegos_venta.csv");
+        if (!file.exists()) return inventarios;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String linea;
+            while ((linea = reader.readLine()) != null){
+                String[] p = linea.split(";");
+
+                Juego juego = new Juego(
+                    Integer.parseInt(p[0]), p[1], Integer.parseInt(p[2]), p[3], p[4],
+                    Integer.parseInt(p[5]), Integer.parseInt(p[6]), Integer.parseInt(p[7]),
+                    Boolean.parseBoolean(p[8]), p[9], Double.parseDouble(p[10])
+                );
+
+                InventarioVenta inventario = new InventarioVenta(
+                    juego, Integer.parseInt(p[11]), p[12]
+                );
+
+                inventarios.add(inventario);
+            }
+        }
+        return inventarios;
+    }
+
+    public List<InventarioPrestamo> cargarInventarioPrestamo() throws IOException{
+        List<InventarioPrestamo> inventarios = new ArrayList<>();
+        File file = new File(RUTA_DATOS + "juegos_prestamo.csv");
+        if (!file.exists()) return inventarios;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String linea;
+            while ((linea = reader.readLine()) != null){
+                String[] p = linea.split(";");
+
+                Juego juego = new Juego(
+                    Integer.parseInt(p[0]), p[1], Integer.parseInt(p[2]), p[3], p[4],
+                    Integer.parseInt(p[5]), Integer.parseInt(p[6]), Integer.parseInt(p[7]),
+                    Boolean.parseBoolean(p[8]), p[9], Double.parseDouble(p[10])
+                );
+
+                InventarioPrestamo inventario = new InventarioPrestamo(
+                    juego, Integer.parseInt(p[12]), Integer.parseInt(p[11]), p[13]
+                );
+
+                inventarios.add(inventario);
+            }
+        }
+        return inventarios;
+    }
+
+    public void guardarPrestamos(List<Prestamo> prestamos) throws IOException{
+        try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "prestamos.csv"))){
+            for (Prestamo p : prestamos){
+                writer.println(p.getId() + ";" + p.getFecha() + ";" + p.getEstado() + ";" + p.getFechaDevolucion());
+            }
+        }
+    }
+
+    public List<Prestamo> cargarPrestamos() throws IOException{
+        List<Prestamo> prestamos = new ArrayList<>();
+        File file = new File(RUTA_DATOS + "prestamos.csv");
+        if (!file.exists()) return prestamos;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String linea;
+            while ((linea = reader.readLine()) != null){
+                String[] p = linea.split(";");
+                int id = Integer.parseInt(p[0]);
+                LocalDate fecha = p[1].equals("null") ? null : LocalDate.parse(p[1]);
+                String estado = p[2];
+                LocalDate fechaDevolucion = p[3].equals("null") ? null : LocalDate.parse(p[3]);
+
+                prestamos.add(new Prestamo(id, fecha, estado, fechaDevolucion));
+            }
+        }
+        return prestamos;
+    }
+
 }
