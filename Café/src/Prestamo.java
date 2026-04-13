@@ -5,23 +5,12 @@ public class Prestamo {
     private LocalDate fecha;
     private String estado;
     private LocalDate fechaDevolucion;
-    private Juego juego;
-    private Usuario prestatario;
-
-    public Prestamo(int id, LocalDate fecha, String estado, LocalDate fechaDevolucion, Usuario prestatario, Juego juego){
-        this.id = id;
-        this.fecha = fecha;
-        this.estado = estado;
-        this.fechaDevolucion = fechaDevolucion;
-    }
 
     public Prestamo(int id, LocalDate fecha, String estado, LocalDate fechaDevolucion) {
         this.id = id;
         this.fecha = fecha;
         this.estado = estado;
         this.fechaDevolucion = fechaDevolucion;
-        this.prestatario = null;
-        this.juego = null;
     }
 
     public int getId(){
