@@ -1,7 +1,7 @@
 public class InventarioPrestamo extends Inventario{
     private int cantidadDisponible;
 
-    public InventarioPrestamo(Juego juego, int cantidad, int cantidadTotal, String estado){
+    public InventarioPrestamo(Juego juego, int cantidadDisponible, int cantidadTotal, String estado){
         super(juego, cantidadTotal, estado);
         this.cantidadDisponible = cantidadDisponible;
     }

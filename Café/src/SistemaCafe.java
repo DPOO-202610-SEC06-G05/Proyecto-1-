@@ -11,6 +11,7 @@ public class SistemaCafe {
     private HistorialVenta historialVentasGlobal;
     private HistorialPrestamo historialPrestamoGlobal;
     private Cafe cafe;
+    private int clientesActuales;
 
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
@@ -21,6 +22,7 @@ public class SistemaCafe {
         this.historialVentasGlobal = new HistorialVenta();
         this.historialPrestamoGlobal = new HistorialPrestamo();
         this.cafe = new Cafe(50);
+        this.clientesActuales = 0;
     }
 
     public void arrancarSistema() {
@@ -69,8 +71,14 @@ public class SistemaCafe {
         this.historialPrestamoGlobal.registrarPrestamo(prestamo);
     }
 
-    public Pedido crearPedido(int id, Mesa mesa) {
-        return new Pedido(id, LocalDate.now(), mesa);
+    public Pedido crearPedido(int id, Mesa mesa, int cantidadPersonas) {
+        boolean pudoEntrar = intentarIngresarClientes(cantidadPersonas);
+        if (!pudoEntrar) {
+            System.out.println("No se pudo crear. Supera capacidad máxima de personas");
+            return null;
+        }
+
+        return new Pedido(id, LocalDate.now(), mesa, cantidadPersonas);
     }
 
     public VentaCafeteria cerrarPedido(Pedido pedido, int idVenta) {
@@ -106,6 +114,30 @@ public class SistemaCafe {
 
         return disponibles;
     }
+
+    public boolean intentarIngresarClientes(int cantidadPersonas) {
+    int capacidadMax = cafe.getCapacidadMax();
+
+        if (clientesActuales + cantidadPersonas > capacidadMax) {
+            System.out.println("Se alcanzó la capacidad máxima. No puede ingresar");
+            return false;
+        }
+
+        clientesActuales += cantidadPersonas;
+        System.out.println("Se pudo ingresar. # Clientes actuales: "+ clientesActuales);
+        return true;
+    }
+
+    public void salirClientes(int cantidadPersonas) {
+        clientesActuales -= cantidadPersonas;
+
+        if (clientesActuales < 0) {
+            clientesActuales = 0;
+        }
+        
+        System.out.println("Clientes actuales: "+clientesActuales);
+    }
+
 
     public static void main(String[] args) {
         SistemaCafe sistema = new SistemaCafe();

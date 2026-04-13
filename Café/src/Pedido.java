@@ -8,13 +8,15 @@ public class Pedido {
     private Mesa mesa;
     private List<ProductoMenu> productos;
     private boolean terminado;
+    private int cantidadPersonas;
 
-    public Pedido(int id, LocalDate fecha, Mesa mesa){
+    public Pedido(int id, LocalDate fecha, Mesa mesa, int cantidadPersonas){
         this.id = id;
         this.fecha = fecha;
         this.mesa = mesa;
         this.productos = new ArrayList<>();
         this.terminado = false;
+        this.cantidadPersonas = cantidadPersonas;
     }
 
     public int getId(){
@@ -31,6 +33,14 @@ public class Pedido {
 
     public List<ProductoMenu> getProductos(){
         return productos;
+    }
+
+    public int getCantidadPersonas(){
+        return cantidadPersonas;
+    }
+
+    public void setCantidadPersonas(int personas){
+        this.cantidadPersonas = personas;
     }
 
     public boolean estaTerminado(){
