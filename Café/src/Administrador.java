@@ -44,4 +44,10 @@ public class Administrador extends Usuario {
     public List<Venta> ventasDetalladas(List<Venta> historialVentas, String rubroSeleccionado, String fecha){
         return historialVentas;
     }
+
+
+    //ACACACACACACACACAC
+    public void crearTorneo(){
+
+    }
 }
