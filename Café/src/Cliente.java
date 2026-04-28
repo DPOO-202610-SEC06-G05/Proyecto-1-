@@ -50,22 +50,18 @@ public class Cliente extends Usuario {
 
         if (mesa == null || !mesa.getOcupada()) {
             System.out.println("Debe tener una mesa asignada para pedir juegos.");
-            return;
         }
     
         if (mesa.getJuegosEnMesa().size() >= 2) {
             System.out.println("Límite alcanzado: No puede tener más de dos juegos en la mesa.");
-            return;
         }
     
         if (inventarioPrestamo.getCantidadDisponible() <= 0) {
             System.out.println("El juego " + juego.getNombre() + " se encuentra prestado actualmente.");
-            return;
         }
     
         if (!prestamo.esAptoJugadores(mesa, juego) || !prestamo.esAptoEdad(mesa, juego)) {
             System.out.println("El juego no es apto para los comensales de esta mesa.");
-            return;
         }
     
         mesa.agregarJuego(juego);

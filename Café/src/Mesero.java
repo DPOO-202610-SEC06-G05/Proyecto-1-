@@ -22,12 +22,10 @@ public class Mesero extends Empleado {
         
         if (trabajando && clientesPorAtender > 0) {
             System.out.println("Préstamo denegado: Estás en turno y hay clientes por atender.");
-            return;
         }
         
         if (inventarioPrestamo.getCantidadDisponible() <= 0) {
             System.out.println("El juego " + juego.getNombre() + " no tiene copias disponibles.");
-            return;
         }
         
         inventarioPrestamo.setCantidadDisponible(inventarioPrestamo.getCantidadDisponible() - 1);

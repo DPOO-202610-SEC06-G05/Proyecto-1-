@@ -82,12 +82,10 @@ public class Pedido {
     public void eliminarProducto(ProductoMenu producto){
         if (terminado){
             System.out.println("No se pueden eliminar productos de un pedido terminado.");
-            return;
         }
 
         if (producto == null){
             System.out.println("No se recibió ningún producto.");
-            return;
         }
 
         if (productos.remove(producto)){

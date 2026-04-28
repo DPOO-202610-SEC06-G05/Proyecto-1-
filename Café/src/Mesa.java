@@ -64,17 +64,14 @@ public class Mesa {
     public void agregarJuego(Juego juego){
         if (juego == null){
             System.out.println("no hay juego");
-            return;
         }
 
         if (juegosEnMesa.size() >= 2){
             System.out.println("no se pueden tener más de 2 juegos en la mesa");
-            return;
         }
 
         if (!juegoAptoParaMesa(juego)){
             System.out.println("juego no es apto para esta mesa");
-            return;
         }
         String nombreJuego = juego.getNombre();
         juegosEnMesa.add(nombreJuego);
