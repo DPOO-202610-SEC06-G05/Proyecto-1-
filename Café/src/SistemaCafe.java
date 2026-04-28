@@ -12,7 +12,7 @@ public class SistemaCafe {
     private HistorialPrestamo historialPrestamoGlobal;
     private Cafe cafe;
     private int clientesActuales;
-
+    private List<Torneo> torneos;
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
         this.usuariosSistema = new ArrayList<Usuario>();
@@ -23,6 +23,7 @@ public class SistemaCafe {
         this.historialPrestamoGlobal = new HistorialPrestamo();
         this.cafe = new Cafe(50);
         this.clientesActuales = 0;
+        this.torneos = new ArrayList<>();
     }
 
     public void arrancarSistema() {
@@ -137,6 +138,25 @@ public class SistemaCafe {
         
         System.out.println("Clientes actuales: "+clientesActuales);
     }
+
+
+
+    public void crearTorneo(Juego juego, int cupos, boolean esAmistoso, Turno turno){
+        Torneo t = new Torneo(juego, cupos, esAmistoso, turno);
+        torneos.add(t);
+    }
+    public List<Torneo> getTorneos(){
+        return torneos;
+    }
+    public Torneo buscarTorneo(Juego juego){
+        for(Torneo t : torneos){
+            if(t.getJuego().equals(juego)){
+                return t;
+            }
+        }
+        return null;
+    }
+
 
 
     public static void main(String[] args) {

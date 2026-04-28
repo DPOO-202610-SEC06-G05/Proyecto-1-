@@ -9,9 +9,11 @@ public class Torneo {
     private List<Usuario> inscritos;
     private int cuposFan;
     private Map<Usuario, Integer> cuposUsuario;
-    Turno turno;
+    private Turno turno;
 
-    public Torneo(Juego juego, int cuposMaximos, boolean esAmistoso, int cuposFan, Turno turno){
+
+
+    public Torneo(Juego juego, int cuposMaximos, boolean esAmistoso, Turno turno){
         this.juego = juego;
         this.cuposMaximos = cuposMaximos;
         this.esAmistoso = esAmistoso;
@@ -21,14 +23,57 @@ public class Torneo {
         this.turno = turno;
     }
 
+    public Juego getJuego(){
+        return juego;
+    }
+
+    public int getCuposMaximos(){
+        return cuposMaximos;
+    }
+
+    public List<Usuario> getIncritos(){
+        return inscritos;
+    }
+    public boolean isEsAmistoso(){
+        return esAmistoso;
+    }
+    public int getCuposFan(){
+        return cuposFan;
+    }
+    
+    private int totalCuposTomados(){
+        int total = 0;
+        for(int cupos : cuposUsuario.values()){
+            total += cupos;
+        }
+        return total;
+    }
+    private boolean esFan(Usuario usuario){
+        if(usuario instanceof Cliente){
+            Cliente c = (Cliente) usuario;
+            return c.getJuegosFavoritos().contains(juego.getNombre());
+        }
+        return false;
+    }
+    private int totalCuposNoFanTomados(){
+        int total = 0;
+        for(Usuario u: cuposUsuario.keySet()){
+            if(!esFan(u)){
+                total += cuposUsuario.get(u);
+            }
+        }
+        return total;
+    }
+
+
+    
     public boolean inscribir(Usuario usuario, int cantidad){
-        int fanActuales = 0;
         int max = cuposUsuario.getOrDefault(usuario, 0);
         if(usuario == null){
             System.out.println("Lo sentimos, el Usuario no existe. ");
             return false;
         }
-        if(inscritos.size() + cantidad > cuposMaximos){
+        if(totalCuposTomados() + cantidad > cuposMaximos){
             System.out.println("Lo sentimos, ya no hay cupo diusponble. ");
             return false;
         }
@@ -39,25 +84,25 @@ public class Torneo {
         if(usuario instanceof Empleado){
             Empleado e = (Empleado) usuario;
             if(e.enTurno(turno)){
-                System.out.println("bro...estas en turno. ");
+                System.out.println("El empleado no puede inscribirse porque esta en turno.");
                 return false;
             }
         }
-        for(Usuario u: inscritos){
-            if(u instanceof Cliente){
-                fanActuales++;
-            }
-        }
-        if (usuario instanceof Cliente){
-            if(fanActuales + cantidad > cuposFan){
-                System.out.println("Lo sentimos,no hay ams cupos para fans. ");
+        if(!esFan(usuario)){
+            int cuposRegulares = cuposMaximos - cuposFan;
+            if(totalCuposNoFanTomados()+ cantidad > cuposRegulares){
+                System.out.println("Lo sentimos, no hay cupos disponibles para los fans");
                 return false;
+
             }
         }
         inscritos.add(usuario);
         cuposUsuario.put(usuario, cuposUsuario.getOrDefault(usuario, 0) + cantidad);
         return true;
     }
+
+
+
 
     public boolean desinscribir(Usuario usuario){
         if(usuario == null){
@@ -74,8 +119,15 @@ public class Torneo {
 
         inscritos.remove(usuario);
         cuposUsuario.remove(usuario);
-
         System.out.println("El usuario se ha desincrito satisfactoriamente. ");
         return true;
+    }
+
+    public void finalizarTorneo(){
+        if(esAmistoso){
+            System.out.println("Torneo amistoso finalizado. Se otorgan descuentos.");
+        }else{
+            System.out.println("Torneo competitivo finalizado. Se otorgan premios.");
+        }
     }
 }

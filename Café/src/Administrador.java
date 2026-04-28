@@ -45,9 +45,4 @@ public class Administrador extends Usuario {
         return historialVentas;
     }
 
-
-    //ACACACACACACACACAC
-    public void crearTorneo(){
-
-    }
 }
