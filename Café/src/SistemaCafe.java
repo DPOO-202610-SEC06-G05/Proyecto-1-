@@ -20,6 +20,7 @@ public class SistemaCafe {
     private Torneo torneo;
     private Juego juego;
     private Turno turno;
+    private Empleado empleado;
 
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
@@ -253,19 +254,29 @@ public class SistemaCafe {
         usuariosSistema.add(new Mesero(2, "Carlos", "carlos", "123", turno, new ArrayList<>(), new ArrayList<>()));
         usuariosSistema.add(new Administrador(3, "Mariana", "maraina@gmail.com", "123"));
         Scanner sc = new Scanner(System.in);
-        Usuario usuario = login(sc);
-        if(usuario == null){
-            return;
+    
+        System.out.println("1. Inicciar sesion");
+        System.out.println("2. Registrarse");
+        int opcion = sc.nextInt();
+        if(opcion == 1){
+            Usuario usuario = login(sc);
+            if(usuario == null){
+                return;
+            }
+            if(usuario instanceof Cliente){
+                menuCliente(sc, (Cliente) usuario);
+            }
+            if(usuario instanceof Empleado){
+                menuEmpleado(sc, (Empleado) usuario);
+            }
+            if(usuario instanceof Administrador){
+                menuAdmin(sc);
+            }
         }
-        if(usuario instanceof Cliente){
-            menuCliente(sc, (Cliente) usuario);
+        if (opcion == 2 ){
+            registrarCliente(sc);
         }
-        if(usuario instanceof Mesero){
-            menuEmpleado(sc, (Mesero) usuario);
-        }
-        if(usuario instanceof Administrador){
-            menuAdmin(sc);
-        }
+        
     }
 
     public void menuCliente(Scanner sc, Cliente cliente){
@@ -288,6 +299,8 @@ public class SistemaCafe {
         System.out.println("1. Crear torneo");
         System.out.println("2. Ver torneos");
         System.out.println("3. Buscar Usuarios");
+        System.out.println("4. Registrar Empleado");
+
         int opcion = sc.nextInt();
         if(opcion == 1){
             crearTorneo(juego, 10, true, turno);;
@@ -311,14 +324,46 @@ public class SistemaCafe {
                 System.out.println("El usuario " + username + " no existe. ");   
             }
         }
+        if(opcion == 4){
+            System.out.println("El empleado que rol tendra: mesero o Cocinero: ");
+            String oempleado = sc.next();
+            if(oempleado.equalsIgnoreCase("Mesero")){
+                System.out.println("Cual es el id del empleado: ");
+                Integer id = sc.nextInt();
+                System.out.println("Como se llama el empelado ");
+                String username = sc.next();
+                System.out.println("Como es el email de el empelado ");
+                String email = sc.next();
+                System.out.println("Cual sera la password de el empelado ");
+                String password = sc.next();
+                Empleado nEmpleado = new Mesero(id, username, email, password, turno, new ArrayList<>(), new ArrayList<>());
+                usuariosSistema.add(nEmpleado);
+                System.out.println("Felicidades el empleado " + username + " se ha registrado con exito. ");
+            }else if (oempleado.equalsIgnoreCase("Cocinero")){
+                System.out.println("Cual es el id del empleado: ");
+                Integer id = sc.nextInt();
+                System.out.println("Como se llama el empelado ");
+                String username = sc.next();
+                System.out.println("Como es el email de el empelado ");
+                String email = sc.next();
+                System.out.println("Cual sera la password de el empelado ");
+                String password = sc.next();
+                Empleado nEmpleado = new Cocinero(id, username, email, password, turno);
+                usuariosSistema.add(nEmpleado);
+                System.out.println("Felicidades el empleado " + username + " se ha registrado con exito. ");
+            }else{
+                System.out.println("Rol invalido. ");
+
+            }
+        }
     }
 
-    public void menuEmpleado(Scanner sc, Mesero mesero){
+    public void menuEmpleado(Scanner sc, Empleado empleado){
         System.out.println("==MENU EMPLEADO==");
         System.out.println("1. Inscribirse a torneo");
         int opcion = sc.nextInt();
         if(opcion == 1){
-            boolean resultado = torneo.inscribir(mesero, 1);
+            boolean resultado = torneo.inscribir(empleado, 1);
             System.out.println(resultado ? "Empleado inscrito" : "No se pudo inscribir el empleado");
         }
     }
@@ -336,5 +381,17 @@ public class SistemaCafe {
         }
         System.out.println("Credenciales incorrectas");
         return null;
+    }
+
+    public void registrarCliente(Scanner sc){
+        System.out.println("Ingrese username: ");
+        String username = sc.next();
+        System.out.println("Ingrese email: ");
+        String email = sc.next();
+        System.out.println("Ingrese password: ");
+        String password = sc.next();
+        Cliente nCliente = new Cliente(usuariosSistema.size() + 1, username, email, password, 0);
+        usuariosSistema.add(nCliente);
+        System.out.println("Felicidades " + username + " te has registrado con exito. ");
     }
 }
