@@ -10,8 +10,9 @@ public class Torneo {
     private int cuposFan;
     private Map<Usuario, Integer> cuposUsuario;
     private Turno turno;
-
-
+    private double tarifaEntrada;
+    private double premioDinero;
+    private double bonoDescuento;
 
     public Torneo(Juego juego, int cuposMaximos, boolean esAmistoso, Turno turno){
         this.juego = juego;
@@ -21,8 +22,10 @@ public class Torneo {
         this.inscritos = new ArrayList<>();
         this.cuposUsuario = new HashMap<>();
         this.turno = turno;
+        this.tarifaEntrada = 20000;
+        this.bonoDescuento = 0.10;
+        this.premioDinero = 0;
     }
-
     public Juego getJuego(){
         return juego;
     }
@@ -31,7 +34,7 @@ public class Torneo {
         return cuposMaximos;
     }
 
-    public List<Usuario> getIncritos(){
+    public List<Usuario> getInscritos(){
         return inscritos;
     }
     public boolean isEsAmistoso(){
@@ -41,6 +44,8 @@ public class Torneo {
         return cuposFan;
     }
     
+
+
     private int totalCuposTomados(){
         int total = 0;
         for(int cupos : cuposUsuario.values()){
@@ -64,7 +69,15 @@ public class Torneo {
         }
         return total;
     }
-
+    private double calcularRecaudo(){
+        double total = 0;
+        for(Usuario u : cuposUsuario.keySet()){
+            if(!(u instanceof Empleado)){
+                total += cuposUsuario.get(u) * tarifaEntrada;
+            }
+        }
+        return total;
+    }
 
     
     public boolean inscribir(Usuario usuario, int cantidad){
@@ -123,11 +136,33 @@ public class Torneo {
         return true;
     }
 
-    public void finalizarTorneo(){
+
+
+
+     public double calcularPremio(){
         if(esAmistoso){
-            System.out.println("Torneo amistoso finalizado. Se otorgan descuentos.");
-        }else{
-            System.out.println("Torneo competitivo finalizado. Se otorgan premios.");
+            return bonoDescuento;
         }
+        premioDinero = calcularRecaudo() * 0.70;
+        return premioDinero;
+    }
+
+    public void finalizarTorneo(Usuario ganador){
+        if(ganador == null){
+            System.out.println("no hat ganador.");
+            return;
+        }
+        if(esAmistoso){
+            double bono = calcularPremio();
+            System.out.println("Torneo amistoso finalizado. Ganador recibe bono de descuento de "+(bono * 100)+"%.");
+            return;
+        }
+        if(ganador instanceof Empleado){
+            System.out.println("Torneo competitivo finalizado. El ganador es empleado, no recibe premio en dinero.");
+            return;
+        }
+    
+        double premio = calcularPremio();
+        System.out.println("Torneo competitivo finalizado. Premio entregado: "+premio);
     }
 }

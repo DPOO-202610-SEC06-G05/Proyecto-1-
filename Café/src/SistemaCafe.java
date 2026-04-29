@@ -156,9 +156,28 @@ public class SistemaCafe {
         }
         return null;
     }
+    /* 
+    public static void main(String[] args){
+        SistemaCafe sistema = new SistemaCafe();
+    
+        Juego juego = new Juego(1,"Catan", 1995, "Kosmos", "Estrategia",
+            3, 4, 10, false, "Disponible", 120000);
+    
+        Turno turno = new Turno("Lunes", "08:00", "12:00");
+        sistema.crearTorneo(juego, 10, true, turno);
+        Torneo torneo = sistema.buscarTorneo(juego);
+        Cliente c1 = new Cliente(1, "Juan", "juan@mail.com", "123", 0);
+        Cliente c2 = new Cliente(2, "Ana", "ana@mail.com", "123", 0);
+        torneo.inscribir(c1, 2);
+        torneo.inscribir(c2, 1);
+    
+        System.out.println("Inscritos: "+torneo.getInscritos().size());
+        torneo.desinscribir(c1);
+        System.out.println("Inscritos después: "+torneo.getInscritos().size());
+    }
+    */
 
-
-
+    /*
     public static void main(String[] args) {
         SistemaCafe sistema = new SistemaCafe();
         sistema.arrancarSistema();
@@ -169,5 +188,42 @@ public class SistemaCafe {
         System.out.println("Préstamos históricos registrados: " + sistema.historialPrestamoGlobal.getPrestamos().size());
 
         sistema.apagarSistema();
+    }
+    */
+    public static void main(String[] args) {
+        SistemaCafe sistema = new SistemaCafe();
+        Juego juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia",
+            3, 4, 10, false, "Disponible", 120000);
+    
+        Turno turno = new Turno("Lunes", "08:00", "12:00");
+        sistema.crearTorneo(juego, 10, true, turno);
+        Torneo amistoso = sistema.getTorneos().get(0);
+    
+        Cliente c1 = new Cliente(1, "Juan", "juan@mail.com", "123", 0);
+        Cliente c2 = new Cliente(2, "Ana", "ana@mail.com", "123", 0);
+        amistoso.inscribir(c1, 2);
+        amistoso.inscribir(c2, 1);
+    
+        System.out.println("----- TORNEO AMISTOSO -----");
+        amistoso.finalizarTorneo(c1);
+    
+        sistema.crearTorneo(juego, 10, false, turno);
+        Torneo competitivo = sistema.getTorneos().get(1);
+        Cliente c3 = new Cliente(3, "Pedro", "p@mail.com", "123", 0);
+        Cliente c4 = new Cliente(4, "Luis", "l@mail.com", "123", 0);
+        competitivo.inscribir(c3, 2);
+        competitivo.inscribir(c4, 1);
+        System.out.println("----- TORNEO COMPETITIVO -----");
+        competitivo.finalizarTorneo(c3);
+    
+        List<String> favoritos = new ArrayList<>();
+        favoritos.add("Catan");
+        List<String> conocidos = new ArrayList<>();
+        conocidos.add("Catan");
+        Mesero e = new Mesero(5, "Carlos", "c@mail.com", "123", turno, favoritos, conocidos);
+    
+        competitivo.inscribir(e, 1);
+        System.out.println("----- EMPLEADO GANADOR -----");
+        competitivo.finalizarTorneo(e);
     }
 }
