@@ -249,36 +249,37 @@ public class SistemaCafe {
         juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia", 3, 4, 10, false, "Disponible", 120000);
         turno = new Turno("Lunes", "08:00", "12:00");
         torneo = new Torneo(juego, 10, true, turno);
-        cliente = new Cliente(1, "Juan", "juan@gmail.com", "123", 0);
+        usuariosSistema.add(new Cliente(1, "Juan", "juan", "123", 0));
+        usuariosSistema.add(new Mesero(2, "Carlos", "carlos", "123", turno, new ArrayList<>(), new ArrayList<>()));
+        usuariosSistema.add(new Administrador(3, "Mariana", "maraina@gmail.com", "123"));
         Scanner sc = new Scanner(System.in);
-        System.out.println("==BIENVENIDO AL CAFE:D==");
-        System.out.println("1. Cliente");
-        System.out.println("2. Administrador");
-        System.out.println("3. Empleado");
-        int opcion = sc.nextInt();
-        if(opcion == 1){
-            menuCliente(sc);
+        Usuario usuario = login(sc);
+        if(usuario == null){
+            return;
         }
-        if(opcion == 2){
+        if(usuario instanceof Cliente){
+            menuCliente(sc, (Cliente) usuario);
+        }
+        if(usuario instanceof Mesero){
+            menuEmpleado(sc, (Mesero) usuario);
+        }
+        if(usuario instanceof Administrador){
             menuAdmin(sc);
-        }
-        if(opcion == 3){
-            menuEmpleado(sc);
         }
     }
 
-    public void menuCliente(Scanner sc){
+    public void menuCliente(Scanner sc, Cliente cliente){
         System.out.println("==MENU CLIENTE==");
-        System.out.println("1. INscribirse a torneo");
-        System.out.println("2. Desisncribirse");
+        System.out.println("1. Inscribirse a torneo");
+        System.out.println("2. Desinscribirse");
         int opcion = sc.nextInt();
         if(opcion == 1){
-            System.out.println("Te estas inscribiendo!");
-            torneo.inscribir(cliente, 2);
+            boolean resultado = torneo.inscribir(cliente, 2);
+            System.out.println(resultado ? "Inscripción exitosa" : "No se pudo inscribir");
         }
         if(opcion == 2){
-            System.out.println("Te estas desinscribiendo!");
-            torneo.desinscribir(cliente);
+            boolean resultado = torneo.desinscribir(cliente);
+            System.out.println(resultado ? "Desinscripción exitosa" : "No se pudo desinscribir");
         }
     }
 
@@ -286,6 +287,7 @@ public class SistemaCafe {
         System.out.println("==MENU ADMINISTRADOR==");
         System.out.println("1. Crear torneo");
         System.out.println("2. Ver torneos");
+        System.out.println("3. Buscar Usuarios");
         int opcion = sc.nextInt();
         if(opcion == 1){
             crearTorneo(juego, 10, true, turno);;
@@ -294,26 +296,45 @@ public class SistemaCafe {
         }
         if(opcion == 2){
             System.out.println("Cantidad de torneos actuales"+torneos.size());
-
+        }
+        if(opcion == 3){
+            boolean ecnontrado = false;
+            System.out.println("Porfavor ingrese el username de la persona: ");
+            String username = sc.next();
+            for(Usuario u: usuariosSistema){
+                if(username.equals(u.getUsername())){
+                    System.out.println("Usuario encontrado: " + u.getUsername());
+                    ecnontrado = true;
+                }
+            }
+            if(!ecnontrado){
+                System.out.println("El usuario " + username + " no existe. ");   
+            }
         }
     }
 
-    public void menuEmpleado(Scanner sc){
+    public void menuEmpleado(Scanner sc, Mesero mesero){
         System.out.println("==MENU EMPLEADO==");
-        System.out.println("1. Incribirse a torneo");
+        System.out.println("1. Inscribirse a torneo");
         int opcion = sc.nextInt();
-        if(opcion==1){
-            List<String> conocidos = new ArrayList<>();
-            conocidos.add("Catan");
-            List<String> favoritos = new ArrayList<>();
-            favoritos.add("Catan");
-            Mesero mesero = new Mesero(2, "Carlos", "c@gmail.com", "123", turno, favoritos, conocidos);
+        if(opcion == 1){
             boolean resultado = torneo.inscribir(mesero, 1);
-            if(resultado){
-                System.out.println("=Empleado inscrito!");
-            }else{
-                System.out.println("No se pudo incribir el empleado! ");
+            System.out.println(resultado ? "Empleado inscrito" : "No se pudo inscribir el empleado");
+        }
+    }
+
+    public Usuario login(Scanner sc){
+        System.out.println("Ingrese username:");
+        String username = sc.next();
+        System.out.println("Ingrese password:");
+        String password = sc.next();
+        for(Usuario u : usuariosSistema){
+            if(u.getUsername().equals(username) && u.getPassword().equals(password)){
+                System.out.println("Login exitoso!");
+                return u;
             }
         }
+        System.out.println("Credenciales incorrectas");
+        return null;
     }
 }
