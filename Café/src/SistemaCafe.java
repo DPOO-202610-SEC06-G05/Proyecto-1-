@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class SistemaCafe {
     private GestorPersistencia persistencia;
@@ -12,7 +13,14 @@ public class SistemaCafe {
     private HistorialPrestamo historialPrestamoGlobal;
     private Cafe cafe;
     private int clientesActuales;
+
+
     private List<Torneo> torneos;
+    private Cliente cliente;
+    private Torneo torneo;
+    private Juego juego;
+    private Turno turno;
+
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
         this.usuariosSistema = new ArrayList<Usuario>();
@@ -139,6 +147,21 @@ public class SistemaCafe {
         System.out.println("Clientes actuales: "+clientesActuales);
     }
 
+        /*
+    public static void main(String[] args) {
+        SistemaCafe sistema = new SistemaCafe();
+        sistema.arrancarSistema();
+
+        System.out.println("Juegos en inventario de préstamo: " + sistema.inventarioPrestamo.size());
+        System.out.println("Juegos en inventario de venta: " + sistema.inventarioVenta.size());
+        System.out.println("Ventas históricas registradas: " + sistema.historialVentasGlobal.getVentas().size());
+        System.out.println("Préstamos históricos registrados: " + sistema.historialPrestamoGlobal.getPrestamos().size());
+
+        sistema.apagarSistema();
+    }
+    */
+
+
 
 
     public void crearTorneo(Juego juego, int cupos, boolean esAmistoso, Turno turno){
@@ -177,19 +200,8 @@ public class SistemaCafe {
     }
     */
 
-    /*
-    public static void main(String[] args) {
-        SistemaCafe sistema = new SistemaCafe();
-        sistema.arrancarSistema();
 
-        System.out.println("Juegos en inventario de préstamo: " + sistema.inventarioPrestamo.size());
-        System.out.println("Juegos en inventario de venta: " + sistema.inventarioVenta.size());
-        System.out.println("Ventas históricas registradas: " + sistema.historialVentasGlobal.getVentas().size());
-        System.out.println("Préstamos históricos registrados: " + sistema.historialPrestamoGlobal.getPrestamos().size());
-
-        sistema.apagarSistema();
-    }
-    */
+     /*
     public static void main(String[] args) {
         SistemaCafe sistema = new SistemaCafe();
         Juego juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia",
@@ -225,5 +237,83 @@ public class SistemaCafe {
         competitivo.inscribir(e, 1);
         System.out.println("----- EMPLEADO GANADOR -----");
         competitivo.finalizarTorneo(e);
+    }
+    */
+
+    public static void main(String[] args) {
+        SistemaCafe sistema = new SistemaCafe();
+        sistema.menuPrincipla();
+    }
+
+    public void menuPrincipla(){
+        juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia", 3, 4, 10, false, "Disponible", 120000);
+        turno = new Turno("Lunes", "08:00", "12:00");
+        torneo = new Torneo(juego, 10, true, turno);
+        cliente = new Cliente(1, "Juan", "juan@gmail.com", "123", 0);
+        Scanner sc = new Scanner(System.in);
+        System.out.println("==BIENVENIDO AL CAFE:D==");
+        System.out.println("1. Cliente");
+        System.out.println("2. Administrador");
+        System.out.println("3. Empleado");
+        int opcion = sc.nextInt();
+        if(opcion == 1){
+            menuCliente(sc);
+        }
+        if(opcion == 2){
+            menuAdmin(sc);
+        }
+        if(opcion == 3){
+            menuEmpleado(sc);
+        }
+    }
+
+    public void menuCliente(Scanner sc){
+        System.out.println("==MENU CLIENTE==");
+        System.out.println("1. INscribirse a torneo");
+        System.out.println("2. Desisncribirse");
+        int opcion = sc.nextInt();
+        if(opcion == 1){
+            System.out.println("Te estas inscribiendo!");
+            torneo.inscribir(cliente, 2);
+        }
+        if(opcion == 2){
+            System.out.println("Te estas desinscribiendo!");
+            torneo.desinscribir(cliente);
+        }
+    }
+
+    public void menuAdmin(Scanner sc){
+        System.out.println("==MENU ADMINISTRADOR==");
+        System.out.println("1. Crear torneo");
+        System.out.println("2. Ver torneos");
+        int opcion = sc.nextInt();
+        if(opcion == 1){
+            crearTorneo(juego, 10, true, turno);;
+            System.out.println("torneo creado!");
+            System.out.println("Cantidad de torneos actuales"+torneos.size());
+        }
+        if(opcion == 2){
+            System.out.println("Cantidad de torneos actuales"+torneos.size());
+
+        }
+    }
+
+    public void menuEmpleado(Scanner sc){
+        System.out.println("==MENU EMPLEADO==");
+        System.out.println("1. Incribirse a torneo");
+        int opcion = sc.nextInt();
+        if(opcion==1){
+            List<String> conocidos = new ArrayList<>();
+            conocidos.add("Catan");
+            List<String> favoritos = new ArrayList<>();
+            favoritos.add("Catan");
+            Mesero mesero = new Mesero(2, "Carlos", "c@gmail.com", "123", turno, favoritos, conocidos);
+            boolean resultado = torneo.inscribir(mesero, 1);
+            if(resultado){
+                System.out.println("=Empleado inscrito!");
+            }else{
+                System.out.println("No se pudo incribir el empleado! ");
+            }
+        }
     }
 }
