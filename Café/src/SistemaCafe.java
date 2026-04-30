@@ -254,29 +254,44 @@ public class SistemaCafe {
         usuariosSistema.add(new Mesero(2, "Carlos", "carlos", "123", turno, new ArrayList<>(), new ArrayList<>()));
         usuariosSistema.add(new Administrador(3, "Mariana", "maraina@gmail.com", "123"));
         Scanner sc = new Scanner(System.in);
-    
-        System.out.println("1. Inicciar sesion");
-        System.out.println("2. Registrarse");
-        int opcion = sc.nextInt();
-        if(opcion == 1){
-            Usuario usuario = login(sc);
-            if(usuario == null){
-                return;
+
+
+        while(true){
+            System.out.println("0. Salir");
+            System.out.println("1. Inicciar sesion");
+            System.out.println("2. Registrarse");
+            int opcion = sc.nextInt();
+            if (opcion == 0 ){
+                try {
+                    persistencia.guardarUsuarios(usuariosSistema);
+                    persistencia.guardarTorneos(torneos);
+                } catch (IOException e) {
+                    System.out.println("Error guardando datos");
+                }
+                break;
             }
-            if(usuario instanceof Cliente){
-                menuCliente(sc, (Cliente) usuario);
+            if(opcion == 1){
+                Usuario usuario = login(sc);
+                if(usuario == null){
+                    return;
+                }
+                if(usuario instanceof Cliente){
+                    menuCliente(sc, (Cliente) usuario);
+                }
+                if(usuario instanceof Empleado){
+                    menuEmpleado(sc, (Empleado) usuario);
+                }
+                if(usuario instanceof Administrador){
+                    menuAdmin(sc);
+                }
             }
-            if(usuario instanceof Empleado){
-                menuEmpleado(sc, (Empleado) usuario);
-            }
-            if(usuario instanceof Administrador){
-                menuAdmin(sc);
+            else if (opcion == 2 ){
+                registrarCliente(sc);
+            }else{
+                System.out.println("Error, volveras al menu. ");
             }
         }
-        if (opcion == 2 ){
-            registrarCliente(sc);
-        }
-        
+        System.out.println("Has salido del programa.");
     }
 
     public void menuCliente(Scanner sc, Cliente cliente){
@@ -292,6 +307,9 @@ public class SistemaCafe {
             boolean resultado = torneo.desinscribir(cliente);
             System.out.println(resultado ? "Desinscripción exitosa" : "No se pudo desinscribir");
         }
+        if(opcion < 1 || opcion > 2){
+            System.out.println("Opcion incorrecta");
+        }
     }
 
     public void menuAdmin(Scanner sc){
@@ -303,9 +321,17 @@ public class SistemaCafe {
 
         int opcion = sc.nextInt();
         if(opcion == 1){
-            crearTorneo(juego, 10, true, turno);;
-            System.out.println("torneo creado!");
-            System.out.println("Cantidad de torneos actuales"+torneos.size());
+            System.out.println("Ingrese cupos del torneo; ");
+            int cupos =sc.nextInt();
+            System.out.println("Es amistosos? true/false ");
+            boolean esAmistoso = sc.nextBoolean();
+            crearTorneo(juego, cupos, esAmistoso, turno);
+            try{
+                persistencia.guardarTorneos(torneos);
+                System.out.println("Torneos guardados correctamente.");
+            }catch(IOException e){
+                System.out.println("Error guardando torneos.");
+            }
         }
         if(opcion == 2){
             System.out.println("Cantidad de torneos actuales"+torneos.size());
@@ -355,6 +381,10 @@ public class SistemaCafe {
                 System.out.println("Rol invalido. ");
 
             }
+            
+        }
+        if(opcion < 1 || opcion > 2){
+            System.out.println("Opcion incorrecta");
         }
     }
 
@@ -365,6 +395,9 @@ public class SistemaCafe {
         if(opcion == 1){
             boolean resultado = torneo.inscribir(empleado, 1);
             System.out.println(resultado ? "Empleado inscrito" : "No se pudo inscribir el empleado");
+        }
+        if(opcion < 1 || opcion > 1){
+            System.out.println("Opcion incorrecta");
         }
     }
 
@@ -392,6 +425,13 @@ public class SistemaCafe {
         String password = sc.next();
         Cliente nCliente = new Cliente(usuariosSistema.size() + 1, username, email, password, 0);
         usuariosSistema.add(nCliente);
+        try{
+            persistencia.guardarUsuarios(usuariosSistema);
+            System.out.println("Guardado con existo: ");
+        }catch(IOException e){
+            System.out.println("Error ");
+
+        }
         System.out.println("Felicidades " + username + " te has registrado con exito. ");
     }
 }

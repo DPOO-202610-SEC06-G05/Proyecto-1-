@@ -30,6 +30,10 @@ public class Torneo {
         return juego;
     }
 
+    public Turno getTurno(){
+        return turno;
+    }
+
     public int getCuposMaximos(){
         return cuposMaximos;
     }

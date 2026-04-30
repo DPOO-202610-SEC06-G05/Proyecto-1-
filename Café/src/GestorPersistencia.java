@@ -210,7 +210,7 @@ public class GestorPersistencia {
         }
         return ventas;
     }
-    
+
     public void guardarPrestamos(List<Prestamo> prestamos) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "prestamos.csv"))) {
             for (Prestamo p : prestamos) {
@@ -237,5 +237,51 @@ public class GestorPersistencia {
             }
         }
         return prestamos;
+    }
+
+
+    public void guardarTorneos(List<Torneo> torneos)throws IOException{
+        try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "torneos.csv"))){
+            for (Torneo t : torneos){
+                writer.println(t.getJuego().getId() + ";" + t.getCuposMaximos() + ";" + t.isEsAmistoso() + ";" + t.getTurno().getDia() + ";" +
+                    t.getTurno().getHoraInicio() + ";" + t.getTurno().getHoraFinal()
+                );
+            }
+        }
+    }
+    
+    public List<Torneo> cargarTorneos(List<InventarioPrestamo> inventarioPrestamo)throws IOException{
+        List<Torneo> torneos = new ArrayList<>();
+        File file = new File(RUTA_DATOS + "torneos.csv");
+        if (!file.exists()){
+            return torneos;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String linea;
+    
+            while ((linea = reader.readLine()) != null){
+                String[] p = linea.split(";");
+                int idJuego = Integer.parseInt(p[0]);
+                int cuposMaximos = Integer.parseInt(p[1]);
+                boolean esAmistoso = Boolean.parseBoolean(p[2]);
+                String dia = p[3];
+                String horaInicio = p[4];
+                String horaFinal = p[5];
+                Juego juegoEncontrado = null;
+                for (InventarioPrestamo inv : inventarioPrestamo){
+                    if (inv.getJuego().getId() == idJuego){
+                        juegoEncontrado = inv.getJuego();
+                        break;
+                    }
+                }
+                if (juegoEncontrado != null){
+                    Turno turno = new Turno(dia, horaInicio, horaFinal);
+                    Torneo torneo = new Torneo(juegoEncontrado, cuposMaximos, esAmistoso, turno);
+                    torneos.add(torneo);
+                }
+            }
+        }
+    
+        return torneos;
     }
 }
