@@ -1,6 +1,6 @@
 {
     "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "/Users/harenn10/Downloads/junit-platform-console-standalone-1.14.4.jar"
+        ".vscode/lib/**/*.jar",
+        "test-lib\\**\\*.jar"
     ]
 }
