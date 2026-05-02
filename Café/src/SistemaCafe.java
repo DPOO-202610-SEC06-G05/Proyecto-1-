@@ -12,7 +12,6 @@ public class SistemaCafe {
     private List<InventarioVenta> inventarioVenta;
     private HistorialVenta historialVentasGlobal;
     private HistorialPrestamo historialPrestamoGlobal;
-    private Cafe cafe;
     private int clientesActuales;
     private List<Torneo> torneos;
     //private Cliente cliente;
@@ -20,6 +19,7 @@ public class SistemaCafe {
     private Juego juego;
     private Turno turno;
     //private Empleado empleado;        Fueron usados para pruebas :V
+    private int capacidadMax;
 
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
@@ -29,7 +29,7 @@ public class SistemaCafe {
         
         this.historialVentasGlobal = new HistorialVenta();
         this.historialPrestamoGlobal = new HistorialPrestamo();
-        this.cafe = new Cafe(50);
+        this.capacidadMax = 50;
         this.clientesActuales = 0;
         this.torneos = new ArrayList<>();
     }
@@ -70,6 +70,14 @@ public class SistemaCafe {
         } catch (IOException e) {
             System.out.println("Error de guardado :( " + e.getMessage());
         }
+    }
+
+    public int getCapacidadMax(){
+        return capacidadMax;
+    }
+
+    public void setCapacidadMax(int capacidadMax){
+        this.capacidadMax = capacidadMax;
     }
 
     public void registrarNuevaVenta(Venta venta) {
@@ -131,7 +139,7 @@ public class SistemaCafe {
     }
 
     public boolean intentarIngresarClientes(int cantidadPersonas) {
-    int capacidadMax = cafe.getCapacidadMax();
+    int capacidadMax = getCapacidadMax();
 
         if (clientesActuales + cantidadPersonas > capacidadMax) {
             System.out.println("Se alcanzó la capacidad máxima. No puede ingresar");
