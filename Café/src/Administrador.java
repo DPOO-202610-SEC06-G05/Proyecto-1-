@@ -2,8 +2,8 @@ import java.util.List;
 
 public class Administrador extends Usuario {
 
-    public Administrador(int id, String username, String email, String password){
-        super(id, username, email, password);
+    public Administrador(int id, String username, String email, String password, boolean esValido){
+        super(id, username, email, password, esValido);
     }
 
     public String getEstadoJuego(Juego juego){

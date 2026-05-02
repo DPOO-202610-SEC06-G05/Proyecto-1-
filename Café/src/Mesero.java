@@ -5,8 +5,8 @@ public class Mesero extends Empleado {
     private List<String> juegosConocidos;
     private List<String> juegosFavoritos;
 
-    public Mesero(int id, String username, String email, String password, Turno turno, List<String> juegosFavoritos, List<String> juegosConocidos){
-        super(id, username, email, password, turno);
+    public Mesero(int id, String username, String email, String password, Turno turno, List<String> juegosFavoritos, List<String> juegosConocidos, boolean esValido){
+        super(id, username, email, password, turno, esValido);
         this.juegosFavoritos = juegosFavoritos != null ? juegosFavoritos : new ArrayList<>();
         this.juegosConocidos = juegosConocidos != null ? juegosConocidos : new ArrayList<>();
     }

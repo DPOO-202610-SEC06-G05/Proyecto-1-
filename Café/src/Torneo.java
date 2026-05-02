@@ -13,8 +13,9 @@ public class Torneo {
     private double tarifaEntrada;
     private double premioDinero;
     private double bonoDescuento;
+    private boolean esValido;
 
-    public Torneo(Juego juego, int cuposMaximos, boolean esAmistoso, Turno turno){
+    public Torneo(Juego juego, int cuposMaximos, boolean esAmistoso, Turno turno, boolean esValido){
         this.juego = juego;
         this.cuposMaximos = cuposMaximos;
         this.esAmistoso = esAmistoso;
@@ -25,6 +26,7 @@ public class Torneo {
         this.tarifaEntrada = 20000;
         this.bonoDescuento = 0.10;
         this.premioDinero = 0;
+        this.esValido = esValido;
     }
     public Juego getJuego(){
         return juego;
@@ -41,14 +43,16 @@ public class Torneo {
     public List<Usuario> getInscritos(){
         return inscritos;
     }
-    public boolean isEsAmistoso(){
+    public boolean isAmistoso(){
         return esAmistoso;
     }
     public int getCuposFan(){
         return cuposFan;
     }
     
-
+    public boolean isValido(){
+        return esValido;
+    }
 
     private int totalCuposTomados(){
         int total = 0;
@@ -57,7 +61,7 @@ public class Torneo {
         }
         return total;
     }
-    private boolean esFan(Usuario usuario){
+    private boolean isFan(Usuario usuario){
         if(usuario instanceof Cliente){
             Cliente c = (Cliente) usuario;
             return c.getJuegosFavoritos().contains(juego.getNombre());
@@ -67,7 +71,7 @@ public class Torneo {
     private int totalCuposNoFanTomados(){
         int total = 0;
         for(Usuario u: cuposUsuario.keySet()){
-            if(!esFan(u)){
+            if(!isFan(u)){
                 total += cuposUsuario.get(u);
             }
         }
@@ -105,7 +109,7 @@ public class Torneo {
                 return false;
             }
         }
-        if(!esFan(usuario)){
+        if(!isFan(usuario)){
             int cuposRegulares = cuposMaximos - cuposFan;
             if(totalCuposNoFanTomados()+ cantidad > cuposRegulares){
                 System.out.println("Lo sentimos, no hay cupos disponibles para los fans");
@@ -144,7 +148,7 @@ public class Torneo {
 
 
      public double calcularPremio(){
-        if(esAmistoso){
+        if(isAmistoso()){
             return bonoDescuento;
         }
         premioDinero = calcularRecaudo() * 0.70;
@@ -156,7 +160,7 @@ public class Torneo {
             System.out.println("no hat ganador.");
             return;
         }
-        if(esAmistoso){
+        if(isAmistoso()){
             double bono = calcularPremio();
             System.out.println("Torneo amistoso finalizado. Ganador recibe bono de descuento de "+(bono * 100)+"%.");
             return;

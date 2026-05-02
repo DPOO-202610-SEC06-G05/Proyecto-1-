@@ -9,14 +9,16 @@ public class Pedido {
     private List<ProductoMenu> productos;
     private boolean terminado;
     private int cantidadPersonas;
+    private boolean esValido;
 
-    public Pedido(int id, LocalDate fecha, Mesa mesa, int cantidadPersonas){
+    public Pedido(int id, LocalDate fecha, Mesa mesa, int cantidadPersonas, boolean esValido){
         this.id = id;
         this.fecha = fecha;
         this.mesa = mesa;
         this.productos = new ArrayList<>();
         this.terminado = false;
         this.cantidadPersonas = cantidadPersonas;
+        this.esValido = esValido;
     }
 
     public int getId(){
@@ -45,6 +47,10 @@ public class Pedido {
 
     public boolean estaTerminado(){
         return terminado;
+    }
+    
+    public boolean esValido() {
+        return esValido;
     }
 
     public void agregarProducto(ProductoMenu producto){

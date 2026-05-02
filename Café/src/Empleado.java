@@ -3,8 +3,8 @@ import java.time.LocalDate;
 public abstract class Empleado extends Usuario {
     protected Turno turno;
 
-    public Empleado(int id, String username, String email, String password, Turno turno){
-        super(id, username, email, password);
+    public Empleado(int id, String username, String email, String password, Turno turno, boolean esValido){
+        super(id, username, email, password, esValido);
         this.turno = turno;
     }
 
@@ -31,7 +31,7 @@ public abstract class Empleado extends Usuario {
             double porcentajeDescuento = codigoDescuento.equals("EMP20") ? 0.20 : 0.10; 
             double valorDescuento = juego.getPrecio() * porcentajeDescuento;
 
-            VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juego.getPrecio(), valorDescuento, this);
+            VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juego.getPrecio(), valorDescuento, this, true);
             
             inventarioVenta.setCantidadTotal(inventarioVenta.getCantidadTotal() - 1);
             
@@ -41,14 +41,14 @@ public abstract class Empleado extends Usuario {
         
         else {
             System.out.println("No hay copias disponibles para venta del juego: " + juego.getNombre());
-            return null;
+            return new VentaJuego(0, LocalDate.now(), 0.0, 0.0, this, false);
         }
     }
 
     public VentaCafeteria comprarProducto(ProductoMenu producto, String codigoDescuento, int idVenta){
         double porcentajeDescuento = codigoDescuento.equals("EMP20") ? 0.20 : 0.10;
         double precioConDescuento = producto.getPrecio() * (1 - porcentajeDescuento);
-        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), precioConDescuento, this);
+        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), precioConDescuento, this, true);
         System.out.println("Pedido de cafetería exitoso con descuento del " + (porcentajeDescuento * 100) + "%.");
         return venta;
     }

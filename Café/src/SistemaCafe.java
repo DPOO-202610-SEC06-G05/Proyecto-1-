@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,14 +14,12 @@ public class SistemaCafe {
     private HistorialPrestamo historialPrestamoGlobal;
     private Cafe cafe;
     private int clientesActuales;
-
-
     private List<Torneo> torneos;
-    private Cliente cliente;
+    //private Cliente cliente;
     private Torneo torneo;
     private Juego juego;
     private Turno turno;
-    private Empleado empleado;
+    //private Empleado empleado;        Fueron usados para pruebas :V
 
     public SistemaCafe() {
         this.persistencia = new GestorPersistencia();
@@ -74,7 +73,9 @@ public class SistemaCafe {
     }
 
     public void registrarNuevaVenta(Venta venta) {
-        this.historialVentasGlobal.registrarVenta(venta);
+        if (venta != null && venta.isValida()) {
+            this.historialVentasGlobal.registrarVenta(venta);
+        }
     }
 
     public void registrarNuevoPrestamo(Prestamo prestamo) {
@@ -85,19 +86,23 @@ public class SistemaCafe {
         boolean pudoEntrar = intentarIngresarClientes(cantidadPersonas);
         if (!pudoEntrar) {
             System.out.println("No se pudo crear. Supera capacidad máxima de personas");
-            return null;
+            return new Pedido(0, LocalDate.now(), mesa, 0, false);
         }
 
-        return new Pedido(id, LocalDate.now(), mesa, cantidadPersonas);
+        return new Pedido(id, LocalDate.now(), mesa, cantidadPersonas, true);
     }
 
     public VentaCafeteria cerrarPedido(Pedido pedido, int idVenta) {
+        if (pedido == null || !pedido.esValido()) {
+            System.out.println("Pedido inválido");
+            return new VentaCafeteria(0, LocalDate.now(), 0.0, 0.0, 0.0, false);
+        }
         double subtotal = pedido.calcularTotal();
         double impuestoConsumo = subtotal * 0.08;
         double propina = subtotal * 0.10;
         double total = subtotal + impuestoConsumo + propina;
 
-        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), total, impuestoConsumo, propina);
+        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), total, impuestoConsumo, propina, true);
         this.historialVentasGlobal.registrarVenta(venta);
         pedido.terminarPedido();
 
@@ -110,7 +115,7 @@ public class SistemaCafe {
                 return u;
             }
         }
-        return null;
+        return new Cliente(0, "", "", "", 0, false);
     }
 
     public List<Juego> juegosDisponiblesPrestamo() {
@@ -166,7 +171,7 @@ public class SistemaCafe {
 
 
     public void crearTorneo(Juego juego, int cupos, boolean esAmistoso, Turno turno){
-        Torneo t = new Torneo(juego, cupos, esAmistoso, turno);
+        Torneo t = new Torneo(juego, cupos, esAmistoso, turno, true);
         torneos.add(t);
     }
     public List<Torneo> getTorneos(){
@@ -178,7 +183,7 @@ public class SistemaCafe {
                 return t;
             }
         }
-        return null;
+        return new Torneo(null, 0, true, null, false);
     }
     /* 
     public static void main(String[] args){
@@ -243,37 +248,39 @@ public class SistemaCafe {
 
     public static void main(String[] args) {
         SistemaCafe sistema = new SistemaCafe();
-        sistema.menuPrincipla();
+        sistema.menuPrincipal();
     }
 
-    public void menuPrincipla(){
+    public void menuPrincipal(){
         juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia", 3, 4, 10, false, "Disponible", 120000);
         turno = new Turno("Lunes", "08:00", "12:00");
-        torneo = new Torneo(juego, 10, true, turno);
-        usuariosSistema.add(new Cliente(1, "Juan", "juan", "123", 0));
-        usuariosSistema.add(new Mesero(2, "Carlos", "carlos", "123", turno, new ArrayList<>(), new ArrayList<>()));
-        usuariosSistema.add(new Administrador(3, "Mariana", "maraina@gmail.com", "123"));
+        torneo = new Torneo(juego, 10, true, turno, true);
+        usuariosSistema.add(new Cliente(1, "Juan", "juan", "123", 0, true));
+        usuariosSistema.add(new Mesero(2, "Carlos", "carlos", "123", turno, new ArrayList<>(), new ArrayList<>(), true));
+        usuariosSistema.add(new Administrador(3, "Mariana", "maraina@gmail.com", "123", true));
         Scanner sc = new Scanner(System.in);
 
 
         while(true){
+            System.out.println("\n== MENU PRINCIPAL ==\n");
             System.out.println("0. Salir");
-            System.out.println("1. Inicciar sesion");
+            System.out.println("1. Iniciar sesion");
             System.out.println("2. Registrarse");
-            int opcion = sc.nextInt();
+            int opcion = validarEntero(sc, "Seleccione una opción:");
             if (opcion == 0 ){
                 try {
                     persistencia.guardarUsuarios(usuariosSistema);
                     persistencia.guardarTorneos(torneos);
                 } catch (IOException e) {
-                    System.out.println("Error guardando datos");
+                    System.out.println("Error guardando datos :'V");
                 }
                 break;
             }
+
             if(opcion == 1){
                 Usuario usuario = login(sc);
-                if(usuario == null){
-                    return;
+                if(usuario == null || !usuario.esValido()){
+                    continue; //continua, hace las verificaciones pero no logra nada, entonces vuelve al menú... (más costoso pero no retorna null)
                 }
                 if(usuario instanceof Cliente){
                     menuCliente(sc, (Cliente) usuario);
@@ -285,47 +292,49 @@ public class SistemaCafe {
                     menuAdmin(sc);
                 }
             }
+
             else if (opcion == 2 ){
                 registrarCliente(sc);
-            }else{
-                System.out.println("Error, volveras al menu. ");
+            }
+            
+            else{
+                System.out.println("Ocurrió un error, volviendo al menu... ");
             }
         }
-        System.out.println("Has salido del programa.");
+        System.out.println("Has salido del programa. Chao :P");
     }
 
     public void menuCliente(Scanner sc, Cliente cliente){
-        System.out.println("==MENU CLIENTE==");
-        System.out.println("1. Inscribirse a torneo");
-        System.out.println("2. Desinscribirse");
-        int opcion = sc.nextInt();
+        System.out.println("\n== MENU CLIENTE ==\n");
+        System.out.println("1. Inscribirse a un torneo");
+        System.out.println("2. Desinscribirse de un torneo");
+        int opcion = validarEntero(sc, "Seleccione una opción:");
         if(opcion == 1){
             boolean resultado = torneo.inscribir(cliente, 2);
-            System.out.println(resultado ? "Inscripción exitosa" : "No se pudo inscribir");
+            System.out.println(resultado ? "Inscripción exitosa :D" : "No se pudo inscribir :(");
         }
         if(opcion == 2){
             boolean resultado = torneo.desinscribir(cliente);
-            System.out.println(resultado ? "Desinscripción exitosa" : "No se pudo desinscribir");
+            System.out.println(resultado ? "Desinscripción exitosa :(" : "No se pudo desinscribir");
         }
         if(opcion < 1 || opcion > 2){
-            System.out.println("Opcion incorrecta");
+            System.out.println("Opcion escogida no es válida.");
         }
     }
 
     public void menuAdmin(Scanner sc){
-        System.out.println("==MENU ADMINISTRADOR==");
+        System.out.println("\n== MENU ADMINISTRADOR ==\n");
         System.out.println("1. Crear torneo");
         System.out.println("2. Ver torneos");
         System.out.println("3. Buscar Usuarios");
         System.out.println("4. Registrar Empleado");
 
-        int opcion = sc.nextInt();
+        int opcion = validarEntero(sc, "Seleccione una opción:");
         if(opcion == 1){
-            System.out.println("Ingrese cupos del torneo; ");
-            int cupos =sc.nextInt();
-            System.out.println("Es amistosos? true/false ");
-            boolean esAmistoso = sc.nextBoolean();
+            int cupos = validarEntero(sc, "Ingrese cupos del torneo:");
+            boolean esAmistoso = validarBoolean(sc, "Es amistoso?, ingrese true/false");
             crearTorneo(juego, cupos, esAmistoso, turno);
+
             try{
                 persistencia.guardarTorneos(torneos);
                 System.out.println("Torneos guardados correctamente.");
@@ -333,65 +342,54 @@ public class SistemaCafe {
                 System.out.println("Error guardando torneos.");
             }
         }
+
         if(opcion == 2){
             System.out.println("Cantidad de torneos actuales"+torneos.size());
         }
+
         if(opcion == 3){
             boolean ecnontrado = false;
-            System.out.println("Porfavor ingrese el username de la persona: ");
-            String username = sc.next();
+            String username = validarTexto(sc, "Porfavor ingrese el username de la persona: ");
+            
             for(Usuario u: usuariosSistema){
                 if(username.equals(u.getUsername())){
                     System.out.println("Usuario encontrado: " + u.getUsername());
                     ecnontrado = true;
                 }
             }
+
             if(!ecnontrado){
                 System.out.println("El usuario " + username + " no existe. ");   
             }
         }
         if(opcion == 4){
-            System.out.println("El empleado que rol tendra: mesero o Cocinero: ");
-            String oempleado = sc.next();
-            if(oempleado.equalsIgnoreCase("Mesero")){
-                System.out.println("Cual es el id del empleado: ");
-                Integer id = sc.nextInt();
-                System.out.println("Como se llama el empelado ");
-                String username = sc.next();
-                System.out.println("Como es el email de el empelado ");
-                String email = sc.next();
-                System.out.println("Cual sera la password de el empelado ");
-                String password = sc.next();
-                Empleado nEmpleado = new Mesero(id, username, email, password, turno, new ArrayList<>(), new ArrayList<>());
-                usuariosSistema.add(nEmpleado);
-                System.out.println("Felicidades el empleado " + username + " se ha registrado con exito. ");
-            }else if (oempleado.equalsIgnoreCase("Cocinero")){
-                System.out.println("Cual es el id del empleado: ");
-                Integer id = sc.nextInt();
-                System.out.println("Como se llama el empelado ");
-                String username = sc.next();
-                System.out.println("Como es el email de el empelado ");
-                String email = sc.next();
-                System.out.println("Cual sera la password de el empelado ");
-                String password = sc.next();
-                Empleado nEmpleado = new Cocinero(id, username, email, password, turno);
-                usuariosSistema.add(nEmpleado);
-                System.out.println("Felicidades el empleado " + username + " se ha registrado con exito. ");
-            }else{
-                System.out.println("Rol invalido. ");
-
-            }
+            String tipoEmpleado = validarTexto(sc, "El empleado tendra rol de (Mesero/Cocinero): ");
+            int id = validarEntero(sc, "ID del empleado: ");
+            String username = validarTexto(sc, "Nombre del empleado: ");
+            String email = validarEmail(sc, "Correo del empleado: ");
+            String password = validarTexto(sc, "Password del empleado: ");
             
-        }
-        if(opcion < 1 || opcion > 2){
-            System.out.println("Opcion incorrecta");
+            if (tipoEmpleado.equalsIgnoreCase("Mesero")) {
+                usuariosSistema.add(new Mesero(id, username, email, password, turno, new ArrayList<>(), new ArrayList<>(), true));
+                System.out.println("Empleado registrado.");
+            } 
+            
+            else if (tipoEmpleado.equalsIgnoreCase("Cocinero")) {
+                usuariosSistema.add(new Cocinero(id, username, email, password, turno, true));
+                System.out.println("Empleado registrado.");
+            } 
+            
+            else {
+                System.out.println("Rol inválido.");
+            }
         }
     }
 
     public void menuEmpleado(Scanner sc, Empleado empleado){
-        System.out.println("==MENU EMPLEADO==");
+        System.out.println("\n==MENU EMPLEADO==\n");
         System.out.println("1. Inscribirse a torneo");
-        int opcion = sc.nextInt();
+        int opcion = validarEntero(sc, "Seleccione una opción:");
+
         if(opcion == 1){
             boolean resultado = torneo.inscribir(empleado, 1);
             System.out.println(resultado ? "Empleado inscrito" : "No se pudo inscribir el empleado");
@@ -402,10 +400,9 @@ public class SistemaCafe {
     }
 
     public Usuario login(Scanner sc){
-        System.out.println("Ingrese username:");
-        String username = sc.next();
-        System.out.println("Ingrese password:");
-        String password = sc.next();
+        String username = validarTexto(sc, "Username: ");
+        String password = validarTexto(sc, "Password: ");
+
         for(Usuario u : usuariosSistema){
             if(u.getUsername().equals(username) && u.getPassword().equals(password)){
                 System.out.println("Login exitoso!");
@@ -413,18 +410,17 @@ public class SistemaCafe {
             }
         }
         System.out.println("Credenciales incorrectas");
-        return null;
+        return new Cliente(0, "", "", "", 0, false);
     }
 
     public void registrarCliente(Scanner sc){
-        System.out.println("Ingrese username: ");
-        String username = sc.next();
-        System.out.println("Ingrese email: ");
-        String email = sc.next();
-        System.out.println("Ingrese password: ");
-        String password = sc.next();
-        Cliente nCliente = new Cliente(usuariosSistema.size() + 1, username, email, password, 0);
+        System.out.println("\n== REGISTRO CLIENTE ==");
+        String username = validarTexto(sc, "INgresa tu username: ");
+        String email = validarEmail(sc, "Ingresa tu correo: ");
+        String password = validarTexto(sc, "Password: ");
+        Cliente nCliente = new Cliente(usuariosSistema.size() + 1, username, email, password, 0, true);
         usuariosSistema.add(nCliente);
+
         try{
             persistencia.guardarUsuarios(usuariosSistema);
             System.out.println("Guardado con existo: ");
@@ -434,4 +430,45 @@ public class SistemaCafe {
         }
         System.out.println("Felicidades " + username + " te has registrado con exito. ");
     }
+
+    // Validaciones de las consolas...
+    private int validarEntero(Scanner sc, String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
+            try {
+                int valor = sc.nextInt();
+                return valor;
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Debes ingresar un número válido.");
+                sc.nextLine(); // limpiar buffer
+                }
+            }
+        }
+    
+        private String validarTexto(Scanner sc, String mensaje) {
+            System.out.print(mensaje);
+            return sc.next();
+        }
+        
+        private boolean validarBoolean(Scanner sc, String mensaje) {
+            while (true) {
+                System.out.print(mensaje + " (true/false): ");
+                String input = sc.next().toLowerCase();
+                if (input.equals("true")) return true;
+                if (input.equals("false")) return false;
+                System.out.println("Entrada inválida. Escribe true o false.");
+            }
+        }
+        
+        private String validarEmail(Scanner sc, String mensaje){
+            while (true){
+                System.out.print(mensaje);
+                String email = sc.next();
+                
+                if(email.contains("@") && email.contains(".")){
+                    return email;
+                }
+                System.out.println("Correo inválido. Intente nuevamente.");
+                }
+            }
 }

@@ -7,8 +7,8 @@ public class Cliente extends Usuario {
     private List<String> juegosFavoritos;
     private List<String> historialCompras;
     
-    public Cliente(int id, String username, String email, String password, int puntosFidelidad){
-        super(id, username, email, password);
+    public Cliente(int id, String username, String email, String password, int puntosFidelidad, boolean esValido){
+        super(id, username, email, password, esValido);
         this.puntosFidelidad = puntosFidelidad;
         this.juegosFavoritos = new ArrayList<>();
         this.historialCompras = new ArrayList<>();
@@ -95,10 +95,10 @@ public class Cliente extends Usuario {
             System.out.println("Error: El juego no se encuentra registrado en esta mesa.");
         }
     }
-    
+
     public VentaJuego comprarJuego(Juego juegoVenta, int idVenta, InventarioVenta inventarioVenta) {
         if (inventarioVenta.getCantidadTotal() > 0) {
-            VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juegoVenta.getPrecio(), 0.0, this);
+            VentaJuego venta = new VentaJuego(idVenta, LocalDate.now(), juegoVenta.getPrecio(), 0.0, this, true);
             
             inventarioVenta.setCantidadTotal(inventarioVenta.getCantidadTotal() - 1);
             this.historialCompras.add("Juego: " + juegoVenta.getNombre());
@@ -108,7 +108,7 @@ public class Cliente extends Usuario {
             return venta;
         } else {
             System.out.println("Lo sentimos, no hay copias disponibles para venta.");
-            return null;
+            return new VentaJuego(0, LocalDate.now(), 0.0, 0.0, this, false); //Ya no retorna null...
         }
     }
 
@@ -117,11 +117,11 @@ public class Cliente extends Usuario {
             Bebida bebida = (Bebida) producto;
             if (bebida.getEsAlcoholica() && mesa.getHayMenores()) {
                 System.out.println("Venta rechazada: No se sirve alcohol en mesas con menores.");
-                return null;
+                return new VentaCafeteria(0, LocalDate.now(), 0.0, this, false);
             }
         }
         
-        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), producto.getPrecio(), this);
+        VentaCafeteria venta = new VentaCafeteria(idVenta, LocalDate.now(), producto.getPrecio(), this, true);
         this.historialCompras.add("Producto: " + producto.getNombre());
         
         int puntosGanados = (int) (venta.getTotal() * 0.01);

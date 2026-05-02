@@ -3,12 +3,14 @@ public abstract class Usuario {
     private String username;
     private String email;
     private String password;
+    protected boolean esValido;
 
-    public Usuario (int id, String username, String email, String password){
+    public Usuario (int id, String username, String email, String password, boolean esValido){
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.esValido = esValido;
     }
 
     public int getId(){
@@ -25,6 +27,10 @@ public abstract class Usuario {
 
     public String getPassword(){
         return password;
+    }
+
+    public boolean esValido() {
+        return esValido;
     }
 
     public boolean login(String username, String email, String password) {

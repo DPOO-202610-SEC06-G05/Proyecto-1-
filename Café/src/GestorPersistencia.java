@@ -48,19 +48,19 @@ public class GestorPersistencia {
                 String pass = p[4];
 
                 if (tipo.equals("Administrador")) {
-                    usuarios.add(new Administrador(id, user, email, pass));
+                    usuarios.add(new Administrador(id, user, email, pass, true));
                 } else if (tipo.equals("Cliente")) {
                     int puntos = Integer.parseInt(p[5]);
-                    usuarios.add(new Cliente(id, user, email, pass, puntos));
+                    usuarios.add(new Cliente(id, user, email, pass, puntos, true));
                 } else if (tipo.equals("Mesero")) {
 
                     List<String> juegosConocidos = new ArrayList<>();
                     if (p.length > 6 && !p[6].equals("Ninguno") && !p[6].equals("N/A")) {
                         juegosConocidos.addAll(Arrays.asList(p[6].split(",")));
                     }
-                    usuarios.add(new Mesero(id, user, email, pass, null, new ArrayList<>(), juegosConocidos));
+                    usuarios.add(new Mesero(id, user, email, pass, null, new ArrayList<>(), juegosConocidos, true));
                 } else if (tipo.equals("Cocinero")) {
-                    usuarios.add(new Cocinero(id, user, email, pass, null));
+                    usuarios.add(new Cocinero(id, user, email, pass, null, true));
                 }
             }
         }
@@ -171,9 +171,10 @@ public class GestorPersistencia {
     public void guardarVentas(List<Venta> ventas) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "ventas.csv"))) {
             for (Venta v : ventas) {
+                if (!v.isValida()) continue;
                 String tipo = v.getClass().getSimpleName();
                 writer.println(v.getId() + ";" + v.getFecha() + ";" + tipo + ";" + 
-                               v.getSubtotal() + ";" + v.getTotal() + ";" + v.getComprador().getId());
+                               v.getSubtotal() + ";" + v.getTotal() + ";" + v.getComprador().getId() + ";" + v.isValida());
             }
         }
     }
@@ -192,6 +193,7 @@ public class GestorPersistencia {
                 String tipo = p[2];
                 double subtotal = Double.parseDouble(p[3]);
                 int idComprador = Integer.parseInt(p[5]);
+                boolean esValida = Boolean.parseBoolean(p[6]);
 
                 Usuario comprador = null;
                 for (Usuario u : usuariosGlobales) {
@@ -202,9 +204,9 @@ public class GestorPersistencia {
                 }
 
                 if (tipo.equals("VentaJuego")) {
-                    ventas.add(new VentaJuego(id, fecha, subtotal, 0.0, comprador));
+                    ventas.add(new VentaJuego(id, fecha, subtotal, 0.0, comprador, esValida));
                 } else if (tipo.equals("VentaCafeteria")) {
-                    ventas.add(new VentaCafeteria(id, fecha, subtotal, comprador));
+                    ventas.add(new VentaCafeteria(id, fecha, subtotal, comprador, esValida));
                 }
             }
         }
@@ -239,12 +241,12 @@ public class GestorPersistencia {
         return prestamos;
     }
 
-
     public void guardarTorneos(List<Torneo> torneos)throws IOException{
         try (PrintWriter writer = new PrintWriter(new FileWriter(RUTA_DATOS + "torneos.csv"))){
             for (Torneo t : torneos){
-                writer.println(t.getJuego().getId() + ";" + t.getCuposMaximos() + ";" + t.isEsAmistoso() + ";" + t.getTurno().getDia() + ";" +
-                    t.getTurno().getHoraInicio() + ";" + t.getTurno().getHoraFinal()
+                if (!t.isValido()) continue;
+                writer.println(t.getJuego().getId() + ";" + t.getCuposMaximos() + ";" + t.isAmistoso() + ";" + t.getTurno().getDia() + ";" +
+                    t.getTurno().getHoraInicio() + ";" + t.getTurno().getHoraFinal() + ";" + t.isValido()
                 );
             }
         }
@@ -267,16 +269,12 @@ public class GestorPersistencia {
                 String dia = p[3];
                 String horaInicio = p[4];
                 String horaFinal = p[5];
-                Juego juegoEncontrado = null;
-                for (InventarioPrestamo inv : inventarioPrestamo){
-                    if (inv.getJuego().getId() == idJuego){
-                        juegoEncontrado = inv.getJuego();
-                        break;
-                    }
-                }
+                boolean esValido = Boolean.parseBoolean(p[6]);
+                Juego juegoEncontrado = buscarJuegoPorId(idJuego, inventarioPrestamo);;
+
                 if (juegoEncontrado != null){
                     Turno turno = new Turno(dia, horaInicio, horaFinal);
-                    Torneo torneo = new Torneo(juegoEncontrado, cuposMaximos, esAmistoso, turno);
+                    Torneo torneo = new Torneo(juegoEncontrado, cuposMaximos, esAmistoso, turno, esValido);
                     torneos.add(torneo);
                 }
             }
@@ -284,4 +282,14 @@ public class GestorPersistencia {
     
         return torneos;
     }
+
+        private Juego buscarJuegoPorId(int idJuego, List<InventarioPrestamo> inventario){
+        for (InventarioPrestamo inv : inventario){
+            if (inv.getJuego().getId() == idJuego){
+                return inv.getJuego();
+                }
+            }
+            return null; //Aquí si está justificado el null pq es para una comparación :P
+        }
+
 }

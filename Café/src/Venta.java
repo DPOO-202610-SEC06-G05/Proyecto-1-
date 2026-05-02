@@ -6,13 +6,15 @@ public abstract class Venta {
     protected LocalDate fecha;
     protected double subtotal; 
     protected Usuario comprador; 
-    protected double total; 
+    protected double total;
+    protected boolean esValida;
 
-    public Venta(int id, LocalDate fecha, double subtotal, Usuario comprador){
+    public Venta(int id, LocalDate fecha, double subtotal, Usuario comprador, boolean esValida){
         this.id = id;
         this.fecha = fecha;
         this.subtotal = subtotal;
         this.comprador = comprador;
+        this.esValida = true;
     }
 
     public int getId(){
@@ -34,8 +36,13 @@ public abstract class Venta {
     public Usuario getComprador(){
         return comprador; 
     }
+    public boolean isValida(){
+        return esValida; 
+    }
 
-    public void registrarVenta(List<Venta> historialCompras){
-        historialCompras.add(this);
+    public void registrarVenta(List<Venta> historialCompras){ //solo registra las ventas válidas
+        if (this.esValida){
+            historialCompras.add(this); 
+        }
     }
 }
