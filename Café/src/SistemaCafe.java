@@ -170,9 +170,6 @@ public class SistemaCafe {
     }
     */
 
-
-
-
     public void crearTorneo(Juego juego, int cupos, boolean esAmistoso, Turno turno){
         Torneo t = new Torneo(juego, cupos, esAmistoso, turno, true);
         torneos.add(t);
@@ -208,8 +205,6 @@ public class SistemaCafe {
         System.out.println("Inscritos después: "+torneo.getInscritos().size());
     }
     */
-
-
      /*
     public static void main(String[] args) {
         SistemaCafe sistema = new SistemaCafe();
@@ -248,7 +243,6 @@ public class SistemaCafe {
         competitivo.finalizarTorneo(e);
     }
     */
-
     public static void main(String[] args) {
         SistemaCafe sistema = new SistemaCafe();
         sistema.menuPrincipal();
@@ -448,30 +442,30 @@ public class SistemaCafe {
             }
         }
     
-        private String validarTexto(Scanner sc, String mensaje) {
+    private String validarTexto(Scanner sc, String mensaje) {
+        System.out.print(mensaje);
+        return sc.next();
+    }
+        
+    private boolean validarBoolean(Scanner sc, String mensaje) {
+        while (true) {
+            System.out.print(mensaje + " (true/false): ");
+            String input = sc.next().toLowerCase();
+            if (input.equals("true")) return true;
+            if (input.equals("false")) return false;
+            System.out.println("Entrada inválida. Escribe true o false.");
+        }
+    }
+        
+    private String validarEmail(Scanner sc, String mensaje){
+        while (true){
             System.out.print(mensaje);
-            return sc.next();
-        }
-        
-        private boolean validarBoolean(Scanner sc, String mensaje) {
-            while (true) {
-                System.out.print(mensaje + " (true/false): ");
-                String input = sc.next().toLowerCase();
-                if (input.equals("true")) return true;
-                if (input.equals("false")) return false;
-                System.out.println("Entrada inválida. Escribe true o false.");
-            }
-        }
-        
-        private String validarEmail(Scanner sc, String mensaje){
-            while (true){
-                System.out.print(mensaje);
-                String email = sc.next();
+            String email = sc.next();
                 
-                if(email.contains("@") && email.contains(".")){
-                    return email;
-                }
-                System.out.println("Correo inválido. Intente nuevamente.");
-                }
+            if(email.contains("@") && email.contains(".")){
+                return email;
             }
+            System.out.println("Correo inválido. Intente nuevamente.");
+            }
+        }
 }
