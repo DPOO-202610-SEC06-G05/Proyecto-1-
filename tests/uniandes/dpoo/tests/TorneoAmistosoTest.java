@@ -1,4 +1,4 @@
-package uniandes.dpoo.proyecto.tests;
+package uniandes.dpoo.tests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
