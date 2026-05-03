@@ -283,7 +283,7 @@ public class GestorPersistencia {
         return torneos;
     }
 
-        private Juego buscarJuegoPorId(int idJuego, List<InventarioPrestamo> inventario){
+    private Juego buscarJuegoPorId(int idJuego, List<InventarioPrestamo> inventario){
         for (InventarioPrestamo inv : inventario){
             if (inv.getJuego().getId() == idJuego){
                 return inv.getJuego();

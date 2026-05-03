@@ -14,11 +14,6 @@ public class SistemaCafe {
     private HistorialPrestamo historialPrestamoGlobal;
     private int clientesActuales;
     private List<Torneo> torneos;
-    //private Cliente cliente;
-    private Torneo torneo;
-    private Juego juego;
-    private Turno turno;
-    //private Empleado empleado;        Fueron usados para pruebas :V
     private int capacidadMax;
 
     public SistemaCafe() {
@@ -260,9 +255,9 @@ public class SistemaCafe {
     }
 
     public void menuPrincipal(){
-        juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia", 3, 4, 10, false, "Disponible", 120000);
-        turno = new Turno("Lunes", "08:00", "12:00");
-        torneo = new Torneo(juego, 10, true, turno, true);
+        Juego juego = new Juego(1, "Catan", 1995, "Kosmos", "Estrategia", 3, 4, 10, false, "Disponible", 120000);
+        Turno turno = new Turno("Lunes", "08:00", "12:00");
+        Torneo torneo = new Torneo(juego, 10, true, turno, true);
         usuariosSistema.add(new Cliente(1, "Juan", "juan", "123", 0, true));
         usuariosSistema.add(new Mesero(2, "Carlos", "carlos", "123", turno, new ArrayList<>(), new ArrayList<>(), true));
         usuariosSistema.add(new Administrador(3, "Mariana", "maraina@gmail.com", "123", true));
@@ -291,13 +286,13 @@ public class SistemaCafe {
                     continue; //continua, hace las verificaciones pero no logra nada, entonces vuelve al menú... (más costoso pero no retorna null)
                 }
                 if(usuario instanceof Cliente){
-                    menuCliente(sc, (Cliente) usuario);
+                    menuCliente(sc, (Cliente) usuario, torneo);
                 }
                 if(usuario instanceof Empleado){
-                    menuEmpleado(sc, (Empleado) usuario);
+                    menuEmpleado(sc, (Empleado) usuario, torneo);
                 }
                 if(usuario instanceof Administrador){
-                    menuAdmin(sc);
+                    menuAdmin(sc, juego, turno);
                 }
             }
 
@@ -312,7 +307,7 @@ public class SistemaCafe {
         System.out.println("Has salido del programa. Chao :P");
     }
 
-    public void menuCliente(Scanner sc, Cliente cliente){
+    public void menuCliente(Scanner sc, Cliente cliente, Torneo torneo){
         System.out.println("\n== MENU CLIENTE ==\n");
         System.out.println("1. Inscribirse a un torneo");
         System.out.println("2. Desinscribirse de un torneo");
@@ -330,7 +325,7 @@ public class SistemaCafe {
         }
     }
 
-    public void menuAdmin(Scanner sc){
+    public void menuAdmin(Scanner sc, Juego juego, Turno turno){
         System.out.println("\n== MENU ADMINISTRADOR ==\n");
         System.out.println("1. Crear torneo");
         System.out.println("2. Ver torneos");
@@ -393,7 +388,7 @@ public class SistemaCafe {
         }
     }
 
-    public void menuEmpleado(Scanner sc, Empleado empleado){
+    public void menuEmpleado(Scanner sc, Empleado empleado, Torneo torneo){
         System.out.println("\n==MENU EMPLEADO==\n");
         System.out.println("1. Inscribirse a torneo");
         int opcion = validarEntero(sc, "Seleccione una opción:");
