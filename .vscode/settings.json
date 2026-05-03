@@ -1,6 +1,0 @@
-{
-    "java.project.referencedLibraries": [
-        ".vscode/lib/**/*.jar",
-        "test-lib\\**\\*.jar"
-    ]
-}
